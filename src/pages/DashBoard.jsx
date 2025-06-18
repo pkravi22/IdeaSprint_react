@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import {
   dashboard,
   rocket,
@@ -10,41 +11,18 @@ import {
 } from "../constants/ImagePath.js";
 
 const Dashboard = () => {
+  const navigate = useNavigate(); // Initialize navigate function
+  const [selectedButton, setSelectedButton] =
+    React.useState("New Demo Request");
+
+  // Handle button click with navigation
+  const handleActionClick = (text, url) => {
+    setSelectedButton(text);
+    navigate(url);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="flex px-4 sm:px-6 md:px-8 text-white w-full bg-[#EB6505] font-bold items-center justify-between py-2">
-        <div className="text-xl sm:text-2xl">IdeaSprint.</div>
-        <div>
-          <nav className="hidden md:flex space-x-6 lg:space-x-8 text-white font-medium">
-            <a href="/home.html" className="hover:text-orange-200 transition">
-              How it works
-            </a>
-            <a href="/home.html" className="hover:text-orange-200 transition">
-              Pricing
-            </a>
-            <a href="/home.html" className="hover:text-orange-200 transition">
-              Testimonials
-            </a>
-            <a href="/home.html" className="hover:text-orange-200 transition">
-              FAQ
-            </a>
-          </nav>
-        </div>
-        <div className="flex gap-2 sm:gap-4 items-center font-normal">
-          <a
-            href="/signup.html"
-            className="text-sm sm:text-base hover:text-orange-200 transition"
-          >
-            Sign in
-          </a>
-          <button className="px-3 py-1 sm:px-4 sm:py-2 bg-white text-[#EB6505] rounded-3xl text-sm sm:text-base hover:bg-orange-50 transition">
-            Get Started
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
       <main className="flex-1 flex flex-col w-full gap-6 px-4 sm:px-6 py-6">
         <section className="flex flex-col">
           <h1 className="text-2xl sm:text-3xl md:text-4xl text-[#2F2F2F] font-medium tracking-tighter">
@@ -73,17 +51,22 @@ const Dashboard = () => {
           <div className="flex-1 bg-white rounded-lg shadow-sm p-4">
             <div className="flex justify-between mb-4">
               <h2 className="font-medium">Recent Projects</h2>
-              <a
-                href="#"
-                className="text-[#EB6505] text-sm hover:text-orange-700 transition"
+              <button
+                className="text-[#EB6505] text-sm hover:text-orange-700 transition text-left"
+                onClick={() => navigate("/projects")}
               >
                 View All
-              </a>
+              </button>
             </div>
             <div className="flex flex-col gap-4 min-h-[200px] justify-center items-center">
               <img src={rocket} alt="Growth" className="w-16 h-16" />
               <p className="text-gray-400">No Project Yet</p>
-              <button className="bg-[#EB6505] rounded-3xl px-6 py-2 w-full max-w-[250px] text-white hover:bg-orange-600 transition transform hover:scale-105">
+              <button
+                className="bg-[#EB6505] rounded-3xl px-6 py-2 w-full max-w-[250px] text-white hover:bg-orange-600 transition transform hover:scale-105"
+                onClick={() =>
+                  handleActionClick("New Demo Request", "/demorequest")
+                }
+              >
                 New Demo Request
               </button>
             </div>
@@ -99,8 +82,8 @@ const Dashboard = () => {
                     key={index}
                     icon={action.icon}
                     text={action.text}
-                    primary={action.primary}
-                    url={action.url}
+                    isSelected={selectedButton === action.text}
+                    onClick={() => handleActionClick(action.text, action.url)}
                   />
                 ))}
               </div>
@@ -138,14 +121,17 @@ const StatCard = ({ title, value, icon, bgColor }) => (
 );
 
 // Action Button Component
-const ActionButton = ({ icon, text, primary, url }) => (
+const ActionButton = ({ icon, text, isSelected, onClick }) => (
   <button
+    onClick={onClick}
     className={`flex gap-2 items-center justify-center rounded-3xl w-full py-2 px-4 text-sm transition
-    ${
-      primary
-        ? "bg-[#EB6505] text-white hover:bg-white transform hover:scale-105"
-        : "border border-gray-200 text-gray-500 hover:bg-orange-500 hover:text-white hover:border-transparent"
-    }`}
+      ${
+        isSelected
+          ? "bg-[#EB6505] text-white"
+          : "bg-white border border-gray-200 text-gray-500"
+      }
+      hover:bg-orange-500 hover:text-white hover:border-transparent
+    `}
   >
     <img src={icon} alt={text} className="w-4 h-4" />
     <span>{text}</span>
@@ -183,22 +169,19 @@ const statsData = [
 // Data for action buttons
 const actionsData = [
   {
-    icon: user,
+    icon: rocket,
     text: "New Demo Request",
-    primary: true,
     url: "/demorequest",
   },
   {
     icon: dashboard,
     text: "View Dashboard",
-    primary: false,
-    url: dashboard,
+    url: "/dashboard",
   },
   {
     icon: contact,
     text: "Contact Support",
-    primary: false,
-    url: "contact",
+    url: "/contact",
   },
 ];
 

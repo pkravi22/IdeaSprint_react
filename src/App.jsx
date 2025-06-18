@@ -10,6 +10,7 @@ import SignUp from "./pages/Auth";
 import Home from "./pages/Home";
 import DashBoard from "./pages/DashBoard";
 import AuthPage from "./component/authpage/AuthPage";
+import DemoRequestForm from "./pages/DemoForm";
 function App() {
   const [count, setCount] = useState(0);
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/authpage" element={<AuthPage />} />
           <Route path="/authpage" element={<AuthPage />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/demorequest" element={<DemoRequestForm />} />
           <Route path="/dashboard" element={<DashBoard />} />
         </Routes>
       </Router>

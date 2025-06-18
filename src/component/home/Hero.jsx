@@ -1,8 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { hero, tick } from "../../constants/ImagePath.js"; //
 
 function Hero() {
+  const navigate = useNavigate();
   return (
     <main>
       <div className="bg-[#EB6505] md:min-h-screen flex flex-col md:flex-row gap-8 px-8 py-12">
@@ -25,7 +26,10 @@ function Hero() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
-            <button className="px-4 md:px-12 py-2 bg-white text-[#EB6505] rounded-full">
+            <button
+              onClick={() => navigate("/demorequest")}
+              className="px-4 md:px-12 py-2 bg-white text-[#EB6505] rounded-full"
+            >
               Start My Demo
             </button>
             <button className="px-4 md:px-12 py-2 text-white border border-white rounded-full">

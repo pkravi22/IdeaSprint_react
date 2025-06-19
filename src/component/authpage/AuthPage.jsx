@@ -10,12 +10,12 @@ const AuthPage = () => {
       {/* <Header /> */}
 
       <main className="flex justify-center items-center py-12">
-        <div className="flex flex-col gap-2 justify-center items-center">
+        <div className="flex flex-col gap-8 justify-center items-center">
           <div className="text-center flex flex-col gap-2 px-2">
             <h1 className=" text-3xl md:text-6xl text-[#2F2F2F] font-inter font-medium tracking-tighter">
               Join IdeaSprint
             </h1>
-            <p className="text-gray-400 text-md">
+            <p className="text-gray-600 text-xl">
               Create your account or sign in to start building your MVP
             </p>
           </div>
@@ -23,10 +23,10 @@ const AuthPage = () => {
           <div className="flex flex-col-reverse md:flex-row  gap-12  w-screen md:w-[840px]">
             {/* Auth Form Section */}
             <div className="flex-1 p-4">
-              <header className="flex justify-around">
+              <header className="flex justify-around shadow-md rounded-md px-2 py-2 gap-4">
                 <button
                   onClick={() => setMode("signin")}
-                  className={`font-medium px-6 p-2 rounded-3xl ${
+                  className={`font-medium flex-1 px-6 p-2 rounded-md ${
                     isSignin ? "bg-orange-300" : ""
                   }`}
                 >
@@ -34,7 +34,7 @@ const AuthPage = () => {
                 </button>
                 <button
                   onClick={() => setMode("signup")}
-                  className={`font-medium px-6 p-2 rounded-3xl ${
+                  className={`font-medium  flex-1 px-6 p-2 rounded-md ${
                     !isSignin ? "bg-orange-300" : ""
                   }`}
                 >
@@ -42,7 +42,7 @@ const AuthPage = () => {
                 </button>
               </header>
 
-              <form className="flex flex-col py-8">
+              <form className="flex flex-col py-8 shadow-md rounded-md px-4">
                 {!isSignin && (
                   <>
                     <div className="flex flex-col gap-2 mb-4">
@@ -97,7 +97,7 @@ const AuthPage = () => {
                   type="submit"
                   className="bg-orange-500 font-medium mx-auto mt-6 w-[96%] flex justify-center text-white px-8 py-2 rounded-3xl"
                 >
-                  {isSignin ? "Signin" : "Signup"}
+                  {isSignin ? "Signin" : "Create Account"}
                 </button>
               </form>
             </div>
@@ -114,24 +114,24 @@ const AuthPage = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col p-2">
-                  <p className="font-medium text-lg text-[#EB6505]">48Hrs</p>
+                <div className="flex flex-col p-2 shadow-md rounded-md">
+                  <p className="font-medium text-xl text-[#EB6505]">48Hrs</p>
                   <p className="text-sm text-[#2F2F2F]">
                     Average delivery time
                   </p>
                 </div>
-                <div className="flex flex-col p-2">
-                  <p className="font-medium text-lg text-[#EB6505]">98%</p>
+                <div className="flex flex-col p-2 shadow-md rounded-md">
+                  <p className="font-medium text-xl text-[#EB6505]">98%</p>
                   <p className="text-sm text-[#2F2F2F]">
                     Project Accuracy rate
                   </p>
                 </div>
-                <div className="flex flex-col p-2">
-                  <p className="font-medium text-lg text-[#EB6505]">500+</p>
+                <div className="flex flex-col p-2 shadow-md rounded-md">
+                  <p className="font-medium text-xl text-[#EB6505]">500+</p>
                   <p className="text-sm text-[#2F2F2F]">Project delivered</p>
                 </div>
-                <div className="flex flex-col p-2">
-                  <p className="font-medium text-lg text-[#EB6505]">$2M+</p>
+                <div className="flex flex-col p-2 shadow-md rounded-md">
+                  <p className="font-medium text-xl text-[#EB6505]">$2M+</p>
                   <p className="text-sm text-[#2F2F2F]">
                     Funding Raised By client
                   </p>

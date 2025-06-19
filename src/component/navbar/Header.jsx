@@ -1,24 +1,48 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSectionClick = (hash) => {
+    if (location.pathname === "/") {
+      const element = document.getElementById(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // Navigate to homepage then scroll to section
+      navigate("/");
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+    setIsOpen(false);
+  };
 
   return (
     <header className="flex px-8 text-white w-full bg-[#EB6505] font-bold items-center justify-between md:px-10 py-2 relative">
       {/* Logo */}
       <div className="text-2xl">
-        {" "}
         <Link to="/">IdeaSprint.</Link>
       </div>
 
       {/* Desktop Nav */}
       <nav className="hidden md:flex space-x-8 text-white font-medium">
-        <Link to="/how-it-works">How it works</Link>
-        <Link to="/pricing">Pricing</Link>
-        <Link to="/testimonials">Testimonials</Link>
-        <Link to="/faq">FAQ</Link>
+        <button onClick={() => handleSectionClick("working")}>
+          How It works
+        </button>
+        <button onClick={() => handleSectionClick("pricing")}>Pricing</button>
+        <button onClick={() => handleSectionClick("testimonials")}>
+          Testimonials
+        </button>
+        <button onClick={() => handleSectionClick("faq")}>FAQ</button>
       </nav>
 
       {/* Desktop Auth Buttons */}
@@ -41,22 +65,18 @@ function Header() {
       {/* Mobile Dropdown */}
       {isOpen && (
         <div className="absolute top-full left-0 w-full bg-[#EB6505] text-white flex flex-col items-start p-4 space-y-4 md:hidden z-50 shadow-md">
-          <Link to="/how-it-works" onClick={() => setIsOpen(false)}>
+          <button onClick={() => handleSectionClick("working")}>
             How it works
-          </Link>
-          <Link to="/pricing" onClick={() => setIsOpen(false)}>
-            Pricing
-          </Link>
-          <Link to="/testimonials" onClick={() => setIsOpen(false)}>
+          </button>
+          <button onClick={() => handleSectionClick("pricing")}>Pricing</button>
+          <button onClick={() => handleSectionClick("testimonials")}>
             Testimonials
-          </Link>
-          <Link to="/faq" onClick={() => setIsOpen(false)}>
-            FAQ
-          </Link>
-          <Link to="/signin" onClick={() => setIsOpen(false)}>
+          </button>
+          <button onClick={() => handleSectionClick("faq")}>FAQ</button>
+          <Link to="/authpage" onClick={() => setIsOpen(false)}>
             Sign in
           </Link>
-          <Link to="/signup" onClick={() => setIsOpen(false)}>
+          <Link to="/authpage" onClick={() => setIsOpen(false)}>
             <button className="px-4 py-2 bg-white text-[#EB6505] rounded-3xl w-full text-left">
               Get Started
             </button>

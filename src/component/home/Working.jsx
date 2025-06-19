@@ -20,9 +20,9 @@ function HowItWorks() {
 
           {/* Steps */}
           <div className="flex flex-col gap-6 py-8">
-            <div>
-              <p className="text-xl font-medium">1. Lorem ipsum</p>
-              <p className="text-[#585858] text-sm font-normal tracking-tight">
+            <div className="pr-4">
+              <p className="text-xl font-medium">1.Submit Your Idea</p>
+              <p className="text-[#585858]  ">
                 Fill out our comprehensive form with your startup concept,
                 target audience, core features, and design preferences.
               </p>
@@ -30,9 +30,9 @@ function HowItWorks() {
 
             <div className="h-[1px] bg-gray-200 w-full" />
 
-            <div>
-              <p className="text-xl font-medium">2. Lorem ipsum</p>
-              <p className="text-[#585858] text-sm font-normal tracking-tight">
+            <div className="pr-4">
+              <p className="text-xl font-medium">2. We Build Your Demo</p>
+              <p className="text-[#585858] ">
                 Our expert development team creates a professional, clickable
                 demo based on your specifications within 24-72 hours.
               </p>
@@ -40,9 +40,9 @@ function HowItWorks() {
 
             <div className="h-[1px] bg-gray-200 w-full" />
 
-            <div>
-              <p className="text-xl font-medium">3. Lorem ipsum</p>
-              <p className="text-[#585858] text-sm font-normal tracking-tight font-inter">
+            <div className="pr-4">
+              <p className="text-xl font-medium">3. Launch & Iterate</p>
+              <p className="text-[#585858] ">
                 Receive your demo link, use it for pitching, testing, or
                 fundraising. Request revisions as needed.
               </p>
@@ -50,12 +50,11 @@ function HowItWorks() {
           </div>
         </div>
 
-        {/* Right Image */}
         <div className="flex-1">
           <img
             src={hero}
             alt="How It Works Illustration"
-            className="w-full h-[500px] object-cover rounded-3xl"
+            className="w-full  h-[300px] md:h-[500px] object-cover rounded-3xl"
           />
         </div>
       </div>

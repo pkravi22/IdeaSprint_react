@@ -32,19 +32,17 @@ const FAQ = () => {
   };
 
   return (
-    <main className="px-8 py-8 flex flex-col md:flex-row justify-center bg-[#F5F5F5] items-start gap-8">
-      {/* Left Side */}
+    <main className="px-10 py-8 flex flex-col md:flex-row justify-center bg-[#F5F5F5] items-start gap-10">
       <div className="flex-1 flex flex-col gap-4">
         <p className="font-inter font-medium  text-4xl sm:text-6xl tracking-tighter text-[#2F2F2F]">
           Frequently <br /> Asked Question
         </p>
-        <p className="font-base tracking-tighter text-md text-[#585858]">
+        <p className=" tracking-tighter  text-[#585858]">
           Everything you need to know <br /> about our demo building service
         </p>
       </div>
 
-      {/* Right Side */}
-      <div className="flex-2 flex flex-col gap-2 w-full">
+      <div className="flex-2 flex flex-col gap-4 w-full">
         {faqData.map((faq, index) => {
           const isOpen = openIndex === index;
 
@@ -52,7 +50,7 @@ const FAQ = () => {
             <div
               key={index}
               onClick={() => toggleFAQ(index)}
-              className={`bg-white rounded-3xl cursor-pointer transition-all duration-300 ${
+              className={`bg-white rounded-xl cursor-pointer transition-all duration-300 ${
                 isOpen ? "text-orange-500" : "text-[#2F2F2F]"
               } hover:text-orange-500  p-2 sm:p-4 flex flex-col gap-2`}
             >

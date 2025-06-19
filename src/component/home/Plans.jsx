@@ -58,8 +58,10 @@ function Plans() {
       <div className="py-8 px-8 flex flex-col justify-center items-center gap-8">
         {/* Heading */}
         <div className="text-center">
-          <h1 className="text-3xl text-[#2F2F2F]">Choose Your Plan</h1>
-          <p className="text-gray-900">
+          <h1 className="text-4xl tracking-tighter font-inter font-medium text-[#2F2F2F] mb-4">
+            Choose Your Plan
+          </h1>
+          <p className="text-gray-600">
             Professional demos tailored to your <br />
             needs and budget
           </p>

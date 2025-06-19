@@ -13,10 +13,20 @@ const Home = () => {
     <div>
       <Hero />
       <Steps />
-      <HowItWorks />
-      <Plans />
-      <FounderTestimonials />
-      <FAQ />
+      <div id="working">
+        <HowItWorks />
+      </div>
+      <div id="pricing">
+        <Plans />
+      </div>
+      <div id="testimonials">
+        <FounderTestimonials />
+      </div>
+
+      <div id="faq">
+        <FAQ />
+      </div>
+
       <CallToAction />
       <Footer />
     </div>

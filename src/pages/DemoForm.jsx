@@ -1,27 +1,34 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
+import axios from "axios";
 
 const DemoRequestForm = () => {
-  const [features, setFeatures] = useState([""]);
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [selectedPlan, setSelectedPlan] = useState(null);
-
-  const addFeature = () => {
-    if (features.length < 5) {
-      setFeatures([...features, ""]);
-    }
-  };
-
-  const handleFeatureChange = (index, value) => {
-    const newFeatures = [...features];
-    newFeatures[index] = value;
-    setFeatures(newFeatures);
-  };
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    projectName: "",
+    shortDescriptionOfIdea: "",
+    targetAudience: "",
+    designPreferences: "",
+    purpose: "",
+    coreFeaturesList: [""],
+    coreFeatures: {
+      auth: false,
+      payment: false,
+      aiSuggestions: false,
+    },
+  });
 
   const plans = [
     {
       id: "basic",
       name: "Basic",
-      price: "$300",
+      price: 300,
       features: [
         "Money Back Guarantee",
         "3-5 Interactive Screens",
@@ -32,7 +39,7 @@ const DemoRequestForm = () => {
     {
       id: "standard",
       name: "Standard",
-      price: "$400",
+      price: 400,
       features: [
         "Everything in Basic",
         "5-8 Interactive Screens",
@@ -43,7 +50,7 @@ const DemoRequestForm = () => {
     {
       id: "premium",
       name: "Premium",
-      price: "$500",
+      price: 500,
       features: [
         "Everything in Standard",
         "8-12 Interactive Screens",
@@ -54,7 +61,7 @@ const DemoRequestForm = () => {
     {
       id: "investor",
       name: "Investor Pack",
-      price: "$750",
+      price: 750,
       features: [
         "Everything in Premium",
         "Pitch deck integration",
@@ -63,7 +70,162 @@ const DemoRequestForm = () => {
       ],
     },
   ];
-  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrorMessage(""); // Clear error on input change
+  };
+  const [files, setFiles] = useState([]);
+
+  const handleFileChange = (event) => {
+    const selectedFiles = Array.from(event.target.files);
+    console.log("selectedFiles ", selectedFiles);
+    setFiles(selectedFiles);
+  };
+
+  const handleFeatureToggle = (feature) => {
+    setFormData({
+      ...formData,
+      coreFeatures: {
+        ...formData.coreFeatures,
+        [feature]: !formData.coreFeatures[feature],
+      },
+    });
+  };
+
+  const handleFeatureChange = (index, value) => {
+    const newFeatures = [...formData.coreFeaturesList];
+    newFeatures[index] = value;
+    setFormData({
+      ...formData,
+      coreFeaturesList: newFeatures,
+    });
+    setErrorMessage(""); // Clear error on input change
+  };
+
+  const addFeature = () => {
+    if (formData.coreFeaturesList.length < 5) {
+      setFormData({
+        ...formData,
+        coreFeaturesList: [...formData.coreFeaturesList, ""],
+      });
+    }
+  };
+
+  const removeFeature = (index) => {
+    if (formData.coreFeaturesList.length > 1) {
+      const newFeatures = formData.coreFeaturesList.filter(
+        (_, i) => i !== index
+      );
+      setFormData({
+        ...formData,
+        coreFeaturesList: newFeatures,
+      });
+    }
+  };
+
+  const validateForm = () => {
+    if (!selectedPlan) {
+      setErrorMessage("Please select a plan");
+      return false;
+    }
+
+    if (formData.coreFeaturesList.filter((f) => f.trim()).length < 3) {
+      setErrorMessage("Please add at least 3 core features");
+      return false;
+    }
+
+    if (
+      !formData.fullName ||
+      !formData.email ||
+      !formData.projectName ||
+      !formData.shortDescriptionOfIdea ||
+      !formData.targetAudience ||
+      !formData.purpose
+    ) {
+      setErrorMessage("Please fill all required fields");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setErrorMessage("Authentication required. Please log in.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const plan = plans.find((p) => p.id === selectedPlan);
+    if (!plan) {
+      setErrorMessage("Please select a plan");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Align payload with backend structure
+    // Try this if the above doesn't work:
+    const payload = {
+      Fullname: formData.fullName,
+      Email: formData.email,
+      ProjectName: formData.projectName,
+      ShortDescriptionOfIdea: formData.shortDescriptionOfIdea, // Use for idea description
+      TargetAudience: formData.targetAudience,
+      DesignPreferences: formData.designPreferences,
+      Purpose: formData.purpose,
+
+      // Handle core features properly
+      CoreFeaturesList: formData.coreFeaturesList.filter(
+        (feature) => feature.trim() !== ""
+      ),
+
+      // Send predefined features as separate fields
+      AuthFeature: formData.coreFeatures.auth,
+      PaymentFeature: formData.coreFeatures.payment,
+      AISuggestionsFeature: formData.coreFeatures.aiSuggestions,
+
+      TotalMoney: String(plan.price),
+      Plan: plan.name,
+    };
+
+    // Debugging logs
+    console.log("Token:", token);
+    console.log("Payload:", JSON.stringify(payload, null, 2));
+
+    try {
+      const res = await axios.post(
+        "https://ideasprint-backend.onrender.com/api/demo-schemas",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Form submitted successfully:", res.data);
+      //navigate("/thank-you");
+    } catch (err) {
+      // ... existing error handling ..
+      console.log(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const selectedPlanObject = plans.find((p) => p.id === selectedPlan);
+  const totalPrice = selectedPlanObject ? selectedPlanObject.price : 0;
+
   return (
     <div className="min-h-screen bg-white font-sans">
       <main className="flex flex-col py-6 sm:py-8 mx-auto max-w-4xl w-full px-4 sm:px-6">
@@ -97,7 +259,28 @@ const DemoRequestForm = () => {
           </p>
         </section>
 
-        <form className="flex flex-col gap-6">
+        {/* Error Message */}
+        {errorMessage && (
+          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+            <div className="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="font-medium">{errorMessage}</span>
+            </div>
+          </div>
+        )}
+
+        <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
           {/* Contact Information */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
@@ -106,15 +289,19 @@ const DemoRequestForm = () => {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <label
-                  htmlFor="name"
+                  htmlFor="fullName"
                   className="font-medium text-[#2F2F2F] text-sm sm:text-base"
                 >
                   Full Name
                 </label>
                 <input
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
                   type="text"
                   placeholder="John Doe"
+                  required
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -125,9 +312,13 @@ const DemoRequestForm = () => {
                   Email
                 </label>
                 <input
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 text-sm sm:text-base"
                   type="email"
                   placeholder="john@gmail.com"
+                  required
                 />
               </div>
             </div>
@@ -147,22 +338,30 @@ const DemoRequestForm = () => {
                   Project/Startup Name
                 </label>
                 <input
+                  name="projectName"
+                  value={formData.projectName}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
                   type="text"
                   placeholder="Enter your project name"
+                  required
                 />
               </div>
               <div className="flex flex-col gap-1">
                 <label
-                  htmlFor="ideaDescription"
+                  htmlFor="shortDescriptionOfIdea"
                   className="font-medium text-[#2F2F2F] text-sm sm:text-base"
                 >
                   Short Description of the Idea
                 </label>
                 <input
+                  name="shortDescriptionOfIdea"
+                  value={formData.shortDescriptionOfIdea}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 text-sm sm:text-base"
                   type="text"
                   placeholder="Describe your startup idea in a few sentences"
+                  required
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -173,8 +372,12 @@ const DemoRequestForm = () => {
                   Target Audience
                 </label>
                 <textarea
+                  name="targetAudience"
+                  value={formData.targetAudience}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 h-24 text-sm sm:text-base"
                   placeholder="Who is your target audience?"
+                  required
                 ></textarea>
               </div>
             </div>
@@ -186,7 +389,7 @@ const DemoRequestForm = () => {
               Core Features (3-5 Required)
             </h2>
             <div className="flex flex-col gap-3">
-              {features.map((feature, index) => (
+              {formData.coreFeaturesList.map((feature, index) => (
                 <div key={index} className="flex gap-2 items-center">
                   <input
                     className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
@@ -194,14 +397,13 @@ const DemoRequestForm = () => {
                     placeholder={`Feature ${index + 1}`}
                     value={feature}
                     onChange={(e) => handleFeatureChange(index, e.target.value)}
+                    required
                   />
                   {index > 0 && (
                     <button
                       type="button"
                       className="text-red-500 hover:text-red-700"
-                      onClick={() =>
-                        setFeatures(features.filter((_, i) => i !== index))
-                      }
+                      onClick={() => removeFeature(index)}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -224,15 +426,45 @@ const DemoRequestForm = () => {
               <button
                 type="button"
                 className={`w-full text-center py-2.5 rounded-xl text-sm sm:text-base font-medium ${
-                  features.length >= 5
+                  formData.coreFeaturesList.length >= 5
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#EB6505] text-white hover:bg-[#d45c04]"
                 }`}
                 onClick={addFeature}
-                disabled={features.length >= 5}
+                disabled={formData.coreFeaturesList.length >= 5}
               >
-                {features.length >= 5 ? "Maximum 5 features" : "Add Feature"}
+                {formData.coreFeaturesList.length >= 5
+                  ? "Maximum 5 features"
+                  : "Add Feature"}
               </button>
+            </div>
+          </section>
+
+          {/* Predefined Features */}
+          <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+            <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
+              Predefined Features
+            </h2>
+            <div className="flex flex-col gap-3">
+              {Object.entries(formData.coreFeatures).map(
+                ([feature, checked]) => (
+                  <div key={feature} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={feature}
+                      checked={checked}
+                      onChange={() => handleFeatureToggle(feature)}
+                      className="h-4 w-4 text-[#EB6505] rounded focus:ring-[#EB6505]"
+                    />
+                    <label
+                      htmlFor={feature}
+                      className="ml-2 text-gray-700 capitalize"
+                    >
+                      {feature.replace(/([A-Z])/g, " $1")}
+                    </label>
+                  </div>
+                )
+              )}
             </div>
           </section>
 
@@ -260,12 +492,29 @@ const DemoRequestForm = () => {
                 <p className="text-gray-500 text-sm sm:text-base">
                   Upload logos, sketches, or design references
                 </p>
-                <button className="border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg px-6 py-2 mt-3 text-sm sm:text-base">
+                <label className="border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg px-6 py-2 mt-3 text-sm sm:text-base cursor-pointer">
                   Choose Files
-                </button>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    multiple
+                    className="hidden"
+                  />
+                </label>
+
                 <p className="text-gray-400 text-xs mt-2">
                   Maximum file size: 10MB
                 </p>
+                {files.length > 0 && (
+                  <div className="mt-4 text-gray-600 text-sm text-left w-full">
+                    <p className="font-medium mb-2">Selected Files:</p>
+                    <ul className="list-disc list-inside">
+                      {files.map((file, index) => (
+                        <li key={index}>{file.name}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           </section>
@@ -278,12 +527,15 @@ const DemoRequestForm = () => {
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-1">
                 <label
-                  htmlFor="uiLook"
+                  htmlFor="designPreferences"
                   className="font-medium text-[#2F2F2F] text-sm sm:text-base"
                 >
                   Preferred UI Look (Optional)
                 </label>
                 <textarea
+                  name="designPreferences"
+                  value={formData.designPreferences}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 h-24 text-sm sm:text-base"
                   placeholder="Describe your preferred colors, styles or reference websites"
                 ></textarea>
@@ -304,7 +556,13 @@ const DemoRequestForm = () => {
                 >
                   What will you use this demo for?
                 </label>
-                <select className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base">
+                <select
+                  name="purpose"
+                  value={formData.purpose}
+                  onChange={handleChange}
+                  className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
+                  required
+                >
                   <option value="">Select purpose</option>
                   <option value="fundraising">Fundraising</option>
                   <option value="user-testing">User Testing</option>
@@ -336,7 +594,7 @@ const DemoRequestForm = () => {
                       {plan.name}
                     </h3>
                     <p className="text-lg sm:text-xl font-medium text-[#2F2F2F]">
-                      {plan.price}
+                      ${plan.price}
                     </p>
                   </div>
                   <div className="mt-3 flex flex-col gap-2">
@@ -372,16 +630,43 @@ const DemoRequestForm = () => {
             <div className="flex flex-col gap-2">
               <div className="p-4 border border-gray-200 rounded-md flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
-                  <p className="font-medium text-lg">Total: $300</p>
+                  <p className="font-medium text-lg">Total: ${totalPrice}</p>
                   <p className="text-gray-500 text-sm sm:text-base mt-1">
                     You'll be redirected to secure payment after submission
                   </p>
                 </div>
                 <button
-                  className="bg-[#EB6505] hover:bg-[#d45c04] rounded-3xl px-6 py-3 text-white font-medium text-base w-full sm:w-auto transition-colors"
-                  disabled={!selectedPlan}
+                  type="submit"
+                  className="bg-[#EB6505] hover:bg-[#d45c04] rounded-3xl px-6 py-3 text-white font-medium text-base w-full sm:w-auto transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  disabled={!selectedPlan || isSubmitting}
                 >
-                  Submit & Pay
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Processing...
+                    </div>
+                  ) : (
+                    "Submit & Pay"
+                  )}
                 </button>
               </div>
             </div>

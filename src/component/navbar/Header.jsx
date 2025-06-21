@@ -1,11 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
-
+import axios from "axios";
+import { CgProfile } from "react-icons/cg";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
   const location = useLocation();
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(
+          "https://ideasprint-backend.onrender.com/api/users/me",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUser(response.data); // Save user info
+        console.log("User fetched:", response.data);
+      } catch (e) {
+        console.log("Error fetching user:", e);
+      }
+    };
+
+    if (token) {
+      fetchUser();
+    }
+  }, [token]);
 
   const handleSectionClick = (hash) => {
     if (location.pathname === "/") {
@@ -27,7 +51,7 @@ function Header() {
   };
 
   return (
-    <header className="flex px-8 text-white w-full bg-[#EB6505] font-bold items-center justify-between md:px-10 py-2 relative">
+    <header className="flex  px-2 sm:px-8 text-white w-full bg-[#EB6505] font-bold items-center justify-between md:px-10 py-2 relative">
       {/* Logo */}
       <div className="text-2xl">
         <Link to="/">IdeaSprint.</Link>
@@ -45,15 +69,21 @@ function Header() {
         <button onClick={() => handleSectionClick("faq")}>FAQ</button>
       </nav>
 
-      {/* Desktop Auth Buttons */}
-      <div className="hidden md:flex gap-4 items-center justify-center font-normal">
-        <Link to="/authpage">Sign in</Link>
-        <Link to="/authpage">
-          <button className="px-4 py-2 bg-white text-[#EB6505] rounded-3xl">
-            Get Started
-          </button>
-        </Link>
-      </div>
+      {user ? (
+        <div className="flex gap-2 items-center ">
+          <CgProfile size={25} />
+          <p>{user.username}</p>
+        </div>
+      ) : (
+        <div className="hidden md:flex gap-4 items-center justify-center font-normal">
+          <Link to="/authpage">Sign in</Link>
+          <Link to="/authpage">
+            <button className="px-4 py-2 bg-white text-[#EB6505] rounded-3xl">
+              Get Started
+            </button>
+          </Link>
+        </div>
+      )}
 
       {/* Mobile Menu Icon */}
       <div className="md:hidden">
@@ -73,14 +103,24 @@ function Header() {
             Testimonials
           </button>
           <button onClick={() => handleSectionClick("faq")}>FAQ</button>
-          <Link to="/authpage" onClick={() => setIsOpen(false)}>
-            Sign in
-          </Link>
-          <Link to="/authpage" onClick={() => setIsOpen(false)}>
-            <button className="px-4 py-2 bg-white text-[#EB6505] rounded-3xl w-full text-left">
-              Get Started
-            </button>
-          </Link>
+
+          {user ? (
+            <div className="flex gap-2 items-center">
+              <CgProfile size={25} />
+              <p>{user.username}</p>
+            </div>
+          ) : (
+            <div className="flex gap-4 items-center justify-center font-normal">
+              <Link to="/authpage" onClick={() => setIsOpen(false)}>
+                Sign in
+              </Link>
+              <Link to="/authpage" onClick={() => setIsOpen(false)}>
+                <button className="px-4 py-2 bg-white text-[#EB6505] rounded-3xl">
+                  Get Started
+                </button>
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </header>

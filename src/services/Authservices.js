@@ -1,0 +1,30 @@
+const BASE_URL = "https://ideasprint-backend.onrender.com/api";
+import axios from "axios";
+export const signup = async (data) => {
+  console.log(data);
+  try {
+    const res = await axios.post(`${BASE_URL}/auth/local/register`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return { success: true, user: res.data };
+  } catch (error) {
+    return { success: false, error: error.response.data };
+  }
+};
+export const signin = async (credentials) => {
+  console.log(credentials);
+  const { email, password } = credentials;
+  try {
+    const res = await axios.post(`${BASE_URL}/auth/local`, credentials, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("Login response", res);
+    return { success: true, user: res.data };
+  } catch (error) {
+    return { error: error?.response?.data };
+  }
+};

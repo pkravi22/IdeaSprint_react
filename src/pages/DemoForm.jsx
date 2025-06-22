@@ -1,27 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import AuthModal from "../modals/AuthModal";
 
 const DemoRequestForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [files, setFiles] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    projectName: "",
-    shortDescriptionOfIdea: "",
-    targetAudience: "",
-    designPreferences: "",
-    purpose: "",
-    coreFeaturesList: [""],
+    Fullname: "",
+    Email: "",
+    ProjectName: "",
+    ShortDescription: "",
+    TargetAudience: "",
+    DesignPreferences: "",
+    Purpose: "",
+    ShortDescriptionOfIdea: "",
     coreFeatures: {
       auth: false,
       payment: false,
       aiSuggestions: false,
     },
+    TotalMoney: "",
+    Plan: "",
   });
 
   const plans = [
@@ -74,13 +78,11 @@ const DemoRequestForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setErrorMessage(""); // Clear error on input change
+    setErrorMessage("");
   };
-  const [files, setFiles] = useState([]);
 
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
-    console.log("selectedFiles ", selectedFiles);
     setFiles(selectedFiles);
   };
 
@@ -94,55 +96,20 @@ const DemoRequestForm = () => {
     });
   };
 
-  const handleFeatureChange = (index, value) => {
-    const newFeatures = [...formData.coreFeaturesList];
-    newFeatures[index] = value;
-    setFormData({
-      ...formData,
-      coreFeaturesList: newFeatures,
-    });
-    setErrorMessage(""); // Clear error on input change
-  };
-
-  const addFeature = () => {
-    if (formData.coreFeaturesList.length < 5) {
-      setFormData({
-        ...formData,
-        coreFeaturesList: [...formData.coreFeaturesList, ""],
-      });
-    }
-  };
-
-  const removeFeature = (index) => {
-    if (formData.coreFeaturesList.length > 1) {
-      const newFeatures = formData.coreFeaturesList.filter(
-        (_, i) => i !== index
-      );
-      setFormData({
-        ...formData,
-        coreFeaturesList: newFeatures,
-      });
-    }
-  };
-
   const validateForm = () => {
     if (!selectedPlan) {
       setErrorMessage("Please select a plan");
       return false;
     }
 
-    if (formData.coreFeaturesList.filter((f) => f.trim()).length < 3) {
-      setErrorMessage("Please add at least 3 core features");
-      return false;
-    }
-
     if (
-      !formData.fullName ||
-      !formData.email ||
-      !formData.projectName ||
-      !formData.shortDescriptionOfIdea ||
-      !formData.targetAudience ||
-      !formData.purpose
+      !formData.Fullname ||
+      !formData.Email ||
+      !formData.ProjectName ||
+      !formData.ShortDescription ||
+      !formData.ShortDescriptionOfIdea ||
+      !formData.TargetAudience ||
+      !formData.Purpose
     ) {
       setErrorMessage("Please fill all required fields");
       return false;
@@ -162,8 +129,10 @@ const DemoRequestForm = () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
+      setIsModalOpen(true);
       setErrorMessage("Authentication required. Please log in.");
       setIsSubmitting(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
@@ -174,61 +143,61 @@ const DemoRequestForm = () => {
       return;
     }
 
-    // Align payload with backend structure
-    // Try this if the above doesn't work:
     const payload = {
-      Fullname: formData.fullName,
-      Email: formData.email,
-      ProjectName: formData.projectName,
-      ShortDescriptionOfIdea: formData.shortDescriptionOfIdea, // Use for idea description
-      TargetAudience: formData.targetAudience,
-      DesignPreferences: formData.designPreferences,
-      Purpose: formData.purpose,
-
-      // Handle core features properly
-      CoreFeaturesList: formData.coreFeaturesList.filter(
-        (feature) => feature.trim() !== ""
-      ),
-
-      // Send predefined features as separate fields
-      AuthFeature: formData.coreFeatures.auth,
-      PaymentFeature: formData.coreFeatures.payment,
-      AISuggestionsFeature: formData.coreFeatures.aiSuggestions,
-
+      Fullname: formData.Fullname,
+      Email: formData.Email,
+      ProjectName: formData.ProjectName,
+      ShortDescription: formData.ShortDescription,
+      TargetAudience: formData.TargetAudience,
+      DesignPreferences: formData.DesignPreferences,
+      Purpose: formData.Purpose,
+      ShortDescriptionOfIdea: formData.ShortDescriptionOfIdea,
+      coreFeatures: {
+        auth: formData.coreFeatures.auth,
+        payment: formData.coreFeatures.payment,
+        aiSuggestions: formData.coreFeatures.aiSuggestions,
+      },
       TotalMoney: String(plan.price),
       Plan: plan.name,
     };
 
-    // Debugging logs
-    console.log("Token:", token);
-    console.log("Payload:", JSON.stringify(payload, null, 2));
-
     try {
       const res = await axios.post(
         "https://ideasprint-backend.onrender.com/api/demo-schemas",
-        payload,
+        { data: payload },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
       console.log("Form submitted successfully:", res.data);
-      //navigate("/thank-you");
+      navigate("/thank-you");
     } catch (err) {
-      // ... existing error handling ..
-      console.log(err);
+      console.error(
+        "Error submitting form:",
+        err.response ? err.response.data : err.message
+      );
+
+      if (err.response?.data?.error?.message?.includes("must be unique")) {
+        setErrorMessage("This email is already registered");
+      } else {
+        setErrorMessage("Failed to submit form. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
+
   const selectedPlanObject = plans.find((p) => p.id === selectedPlan);
   const totalPrice = selectedPlanObject ? selectedPlanObject.price : 0;
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white font-sans relative">
       <main className="flex flex-col py-6 sm:py-8 mx-auto max-w-4xl w-full px-4 sm:px-6">
+        {/* Header Section */}
         <section className="flex flex-col justify-center items-start mb-6">
           <button
             onClick={() => navigate("/home")}
@@ -288,15 +257,12 @@ const DemoRequestForm = () => {
             </h2>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="fullName"
-                  className="font-medium text-[#2F2F2F] text-sm sm:text-base"
-                >
+                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
                   Full Name
                 </label>
                 <input
-                  name="fullName"
-                  value={formData.fullName}
+                  name="Fullname"
+                  value={formData.Fullname}
                   onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
                   type="text"
@@ -305,15 +271,12 @@ const DemoRequestForm = () => {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="email"
-                  className="font-medium text-[#2F2F2F] text-sm sm:text-base"
-                >
+                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
                   Email
                 </label>
                 <input
-                  name="email"
-                  value={formData.email}
+                  name="Email"
+                  value={formData.Email}
                   onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 text-sm sm:text-base"
                   type="email"
@@ -331,15 +294,12 @@ const DemoRequestForm = () => {
             </h2>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="projectName"
-                  className="font-medium text-[#2F2F2F] text-sm sm:text-base"
-                >
+                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
                   Project/Startup Name
                 </label>
                 <input
-                  name="projectName"
-                  value={formData.projectName}
+                  name="ProjectName"
+                  value={formData.ProjectName}
                   onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
                   type="text"
@@ -348,32 +308,39 @@ const DemoRequestForm = () => {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="shortDescriptionOfIdea"
-                  className="font-medium text-[#2F2F2F] text-sm sm:text-base"
-                >
-                  Short Description of the Idea
+                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
+                  Short Description
                 </label>
                 <input
-                  name="shortDescriptionOfIdea"
-                  value={formData.shortDescriptionOfIdea}
+                  name="ShortDescription"
+                  value={formData.ShortDescription}
                   onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 text-sm sm:text-base"
                   type="text"
-                  placeholder="Describe your startup idea in a few sentences"
+                  placeholder="Brief description of your project"
                   required
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="targetAudience"
-                  className="font-medium text-[#2F2F2F] text-sm sm:text-base"
-                >
+                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
+                  Detailed Description
+                </label>
+                <textarea
+                  name="ShortDescriptionOfIdea"
+                  value={formData.ShortDescriptionOfIdea}
+                  onChange={handleChange}
+                  className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 h-24 text-sm sm:text-base"
+                  placeholder="Detailed description of your startup idea"
+                  required
+                ></textarea>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
                   Target Audience
                 </label>
                 <textarea
-                  name="targetAudience"
-                  value={formData.targetAudience}
+                  name="TargetAudience"
+                  value={formData.TargetAudience}
                   onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 h-24 text-sm sm:text-base"
                   placeholder="Who is your target audience?"
@@ -383,67 +350,10 @@ const DemoRequestForm = () => {
             </div>
           </section>
 
-          {/* Core Features */}
-          <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
-              Core Features (3-5 Required)
-            </h2>
-            <div className="flex flex-col gap-3">
-              {formData.coreFeaturesList.map((feature, index) => (
-                <div key={index} className="flex gap-2 items-center">
-                  <input
-                    className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
-                    type="text"
-                    placeholder={`Feature ${index + 1}`}
-                    value={feature}
-                    onChange={(e) => handleFeatureChange(index, e.target.value)}
-                    required
-                  />
-                  {index > 0 && (
-                    <button
-                      type="button"
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => removeFeature(index)}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                className={`w-full text-center py-2.5 rounded-xl text-sm sm:text-base font-medium ${
-                  formData.coreFeaturesList.length >= 5
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#EB6505] text-white hover:bg-[#d45c04]"
-                }`}
-                onClick={addFeature}
-                disabled={formData.coreFeaturesList.length >= 5}
-              >
-                {formData.coreFeaturesList.length >= 5
-                  ? "Maximum 5 features"
-                  : "Add Feature"}
-              </button>
-            </div>
-          </section>
-
           {/* Predefined Features */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
-              Predefined Features
+              Core Features
             </h2>
             <div className="flex flex-col gap-3">
               {Object.entries(formData.coreFeatures).map(
@@ -468,57 +378,6 @@ const DemoRequestForm = () => {
             </div>
           </section>
 
-          {/* Design References */}
-          <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
-              Design References
-            </h2>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2 border border-gray-300 rounded-md text-gray-500 flex justify-center items-center p-6 text-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10 text-gray-400 mb-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
-                <p className="text-gray-500 text-sm sm:text-base">
-                  Upload logos, sketches, or design references
-                </p>
-                <label className="border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg px-6 py-2 mt-3 text-sm sm:text-base cursor-pointer">
-                  Choose Files
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    multiple
-                    className="hidden"
-                  />
-                </label>
-
-                <p className="text-gray-400 text-xs mt-2">
-                  Maximum file size: 10MB
-                </p>
-                {files.length > 0 && (
-                  <div className="mt-4 text-gray-600 text-sm text-left w-full">
-                    <p className="font-medium mb-2">Selected Files:</p>
-                    <ul className="list-disc list-inside">
-                      {files.map((file, index) => (
-                        <li key={index}>{file.name}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-
           {/* Design Preferences */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
@@ -526,15 +385,12 @@ const DemoRequestForm = () => {
             </h2>
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="designPreferences"
-                  className="font-medium text-[#2F2F2F] text-sm sm:text-base"
-                >
-                  Preferred UI Look (Optional)
+                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
+                  Preferred UI Look
                 </label>
                 <textarea
-                  name="designPreferences"
-                  value={formData.designPreferences}
+                  name="DesignPreferences"
+                  value={formData.DesignPreferences}
                   onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 h-24 text-sm sm:text-base"
                   placeholder="Describe your preferred colors, styles or reference websites"
@@ -550,25 +406,17 @@ const DemoRequestForm = () => {
             </h2>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="purpose"
-                  className="font-medium text-[#2F2F2F] text-sm sm:text-base"
-                >
+                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
                   What will you use this demo for?
                 </label>
-                <select
-                  name="purpose"
-                  value={formData.purpose}
+                <input
+                  name="Purpose"
+                  value={formData.Purpose}
                   onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
+                  placeholder="Purpose of this demo"
                   required
-                >
-                  <option value="">Select purpose</option>
-                  <option value="fundraising">Fundraising</option>
-                  <option value="user-testing">User Testing</option>
-                  <option value="pitch">Pitch Presentation</option>
-                  <option value="development">Development Reference</option>
-                </select>
+                />
               </div>
             </div>
           </section>
@@ -623,6 +471,7 @@ const DemoRequestForm = () => {
             </div>
           </section>
 
+          {/* Order Summary */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
               Order Summary
@@ -689,6 +538,15 @@ const DemoRequestForm = () => {
           </div>
         </footer>
       </main>
+
+      {isModalOpen && (
+        <div className=" w-full min-h-screen bg-white  absolute flex justify-center items-center top-0 ">
+          <AuthModal
+            errorMessage={errorMessage}
+            setIsModalOpen={setIsModalOpen}
+          />
+        </div>
+      )}
     </div>
   );
 };

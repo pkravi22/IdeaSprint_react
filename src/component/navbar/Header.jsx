@@ -70,7 +70,10 @@ function Header() {
       </nav>
 
       {user ? (
-        <div className="flex gap-2 items-center ">
+        <div
+          className="flex gap-2 items-center "
+          onClick={() => navigate("/dashboard")}
+        >
           <CgProfile size={25} />
           <p>{user.username}</p>
         </div>
@@ -105,7 +108,10 @@ function Header() {
           <button onClick={() => handleSectionClick("faq")}>FAQ</button>
 
           {user ? (
-            <div className="flex gap-2 items-center">
+            <div
+              className="flex gap-2 items-center"
+              onClick={() => navigate("/dashboard")}
+            >
               <CgProfile size={25} />
               <p>{user.username}</p>
             </div>

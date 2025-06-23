@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { signin, signup } from "../../services/Authservices";
 import { useUser } from "../../context/userContext";
 import { useNavigate } from "react-router";
-
+import CryptoJS from "crypto-js";
 const AuthPage = () => {
   const [mode, setMode] = useState("signin");
   const [loading, setLoading] = useState(false);
@@ -17,6 +17,19 @@ const AuthPage = () => {
     identifier: "",
     password: "",
   });
+  // ------------------------
+  //
+  //encrypt the payload before sending it to the server
+  // const encryptPayload = (payload, secretKey) => {
+  //   const ciphertext = CryptoJS.AES.encrypt(
+  //     JSON.stringify(payload),
+  //     secretKey
+  //   ).toString();
+  //   return ciphertext;
+  // };
+  //const secretKey = "your-256-bit-secret";
+
+  // ----------------------------------
 
   const isSignin = mode === "signin";
 
@@ -44,6 +57,8 @@ const AuthPage = () => {
       alert("Please fill in all fields");
       return;
     }
+    //const payload = { ...loginDetails };
+    //const encryptedPayload = encryptPayload(payload, secretKey);
 
     try {
       const res = await signin({ identifier, password });

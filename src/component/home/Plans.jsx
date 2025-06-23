@@ -74,7 +74,7 @@ function Plans() {
               key={index}
               className={`w-56 bg-white ${
                 plan.title === "Premium" ? "h-80" : "h-72"
-              } rounded-xl hover:bg-[#EB6505] flex flex-col gap-4 text-[#848199] hover:text-white p-2`}
+              } rounded-xl hover:bg-[#EB6505] active:bg-[#EB6505] flex flex-col gap-4 text-[#848199] hover:text-white active:text-white p-2`}
             >
               {plan.badge && (
                 <div className="text-blue-500 text-[10px] font-medium border border-gray-300 w-20 bg-white px-2 py-1 rounded-full flex justify-end">

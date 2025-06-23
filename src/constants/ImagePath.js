@@ -6,7 +6,7 @@ import mind from "../assets/image 3.png";
 import hero from "../assets/hero.jpg";
 import colon from "../assets/colon.png";
 import rocket from "../assets/rocket.png";
-import user from "../assets/user.png";
+import userIcon from "../assets/user.png";
 import tick from "../assets/Vector.png";
 import profile2 from "../assets/pic1.png";
 import profile3 from "../assets/pic2.png";
@@ -24,7 +24,7 @@ export {
   hero,
   colon,
   rocket,
-  user,
+  userIcon,
   tick,
   profile2,
   profile3,

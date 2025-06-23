@@ -3,26 +3,31 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 import axios from "axios";
 import { CgProfile } from "react-icons/cg";
+import { useUser } from "../../context/userContext";
+
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
-
   const location = useLocation();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
+  // Get user data and methods from context
+  const { user, login, logout } = useUser();
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          "https://ideasprint-backend.onrender.com/api/users/me",
+          "https://ideasprint-backend.onrender.com/api/users/me?populate=demo_schemas",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setUser(response.data); // Save user info
+        login(response.data); // Update context with user data
         console.log("User fetched:", response.data);
       } catch (e) {
         console.log("Error fetching user:", e);
+        logout(); // Clear user data if fetch fails
       }
     };
 
@@ -38,7 +43,6 @@ function Header() {
         element.scrollIntoView({ behavior: "smooth" });
       }
     } else {
-      // Navigate to homepage then scroll to section
       navigate("/");
       setTimeout(() => {
         const element = document.getElementById(hash);
@@ -50,8 +54,13 @@ function Header() {
     setIsOpen(false);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
-    <header className="flex  px-2 sm:px-8 text-white w-full bg-[#EB6505] font-bold items-center justify-between md:px-10 py-2 relative">
+    <header className="flex px-2 sm:px-8 text-white w-full bg-[#EB6505] font-bold items-center justify-between md:px-10 py-2 relative">
       {/* Logo */}
       <div className="text-2xl">
         <Link to="/">IdeaSprint.</Link>
@@ -70,12 +79,20 @@ function Header() {
       </nav>
 
       {user ? (
-        <div
-          className="flex gap-2 items-center "
-          onClick={() => navigate("/dashboard")}
-        >
-          <CgProfile size={25} />
-          <p>{user.username}</p>
+        <div className="flex items-center gap-4">
+          <div
+            className="flex gap-2 items-center cursor-pointer"
+            onClick={() => navigate("/dashboard")}
+          >
+            <CgProfile size={25} />
+            <p>{user.username}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1 bg-white text-[#EB6505] rounded-md text-sm"
+          >
+            Logout
+          </button>
         </div>
       ) : (
         <div className="hidden md:flex gap-4 items-center justify-center font-normal">
@@ -108,12 +125,26 @@ function Header() {
           <button onClick={() => handleSectionClick("faq")}>FAQ</button>
 
           {user ? (
-            <div
-              className="flex gap-2 items-center"
-              onClick={() => navigate("/dashboard")}
-            >
-              <CgProfile size={25} />
-              <p>{user.username}</p>
+            <div className="w-full flex flex-col gap-3">
+              <div
+                className="flex gap-2 items-center"
+                onClick={() => {
+                  navigate("/dashboard");
+                  setIsOpen(false);
+                }}
+              >
+                <CgProfile size={25} />
+                <p>{user.username}</p>
+              </div>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }}
+                className="px-3 py-1 bg-white text-[#EB6505] rounded-md"
+              >
+                Logout
+              </button>
             </div>
           ) : (
             <div className="flex gap-4 items-center justify-center font-normal">

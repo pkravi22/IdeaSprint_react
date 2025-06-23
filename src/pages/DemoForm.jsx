@@ -174,7 +174,7 @@ const DemoRequestForm = () => {
       );
 
       console.log("Form submitted successfully:", res.data);
-      navigate("/thank-you");
+      navigate("/payment");
     } catch (err) {
       console.error(
         "Error submitting form:",

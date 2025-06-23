@@ -66,7 +66,6 @@ const AuthPage = () => {
       if (res.success) {
         localStorage.setItem("token", res.user.jwt);
         navigate("/home");
-        // Handle successful signin, e.g., redirect or show success message
       } else {
         throw new Error(res.error.message || "Signin failed");
       }
@@ -88,8 +87,12 @@ const AuthPage = () => {
     }
 
     try {
-      await signup({ username, email, password });
-      // Handle successful signup
+      const res = await signup({ username, email, password });
+
+      if (res.success) {
+        // localStorage.setItem("token", res.user.jwt);
+        navigate("/authpage");
+      }
     } catch (error) {
       alert(error.message || "Signup failed");
     }

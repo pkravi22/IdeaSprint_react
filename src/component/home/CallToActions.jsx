@@ -2,7 +2,7 @@ import React from "react";
 import { airplane } from "../../constants/ImagePath.js"; // Importing airplane image from constants
 const CallToAction = () => {
   return (
-    <main className="p-8 md:px-12 md:py-12">
+    <main className="px-4 sm:px-8 py-8">
       <div className="relative max-w-[1300px] bg-[#EB6505] min-h-48 w-full rounded-3xl">
         {/* Left Content */}
         <div className="w-full md:w-1/2  px-4 md:px-14 py-8 text-white flex flex-col gap-4">

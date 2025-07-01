@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   dashboard,
   rocket,
-   userIcon,
+  userIcon,
   contact,
   clock,
   chart,
@@ -13,70 +13,64 @@ import { useUser } from "../context/userContext.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [selectedButton, setSelectedButton] =
-    React.useState("New Demo Request");
+  const [selectedButton, setSelectedButton] = useState("New Demo Request");
   const { user } = useUser();
   const token = localStorage.getItem("token");
-  
+  const [viewall, setViewAll] = useState(false);
+  const [requestToDisplay, setRequestToDisplay] = useState([]);
 
-  const uniqueDemoRequests = user?.demo_schemas?.reduce((acc, current) => {
-    if (!acc.some((item) => item.documentId === current.documentId)) {
-      acc.push(current);
-    }
-    return acc;
-  }, []);
+  // Safely calculate unique demo requests
+  const uniqueDemoRequests = useMemo(() => {
+    if (!Array.isArray(user?.demo_schemas)) return [];
+    return user.demo_schemas.reduce((acc, current) => {
+      if (!acc.some((item) => item.documentId === current.documentId)) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+  }, [user]);
 
-  let totalPending = uniqueDemoRequests?.filter(
+  // Count pending requests
+  const totalPending = uniqueDemoRequests?.filter(
     (request) => request.Demo_status === "pending"
-  ).length;
-  console.log("totalPending", totalPending);
+  )?.length;
 
+  // Stats data
   const statsData = [
-  {
-    title: "Today's Money",
-    value: "0",
-    icon: rocket,
-    bgColor: "bg-blue-600",
-  },
-  {
-    title: "In Progress",
-    value: totalPending,
-    icon: clock,
-    bgColor: "bg-orange-400",
-  },
-  {
-    title: "Completed",
-    value: "0",
-    icon: chart,
-    bgColor: "bg-green-600",
-  },
-  {
-    title: "Avg.Delivery",
-    value: "24-72h",
-    icon:  userIcon,
-    bgColor: "bg-violet-600",
-  },
-];
+    {
+      title: "Today's Money",
+      value: "0",
+      icon: rocket,
+      bgColor: "bg-blue-600",
+    },
+    {
+      title: "In Progress",
+      value: totalPending,
+      icon: clock,
+      bgColor: "bg-orange-400",
+    },
+    {
+      title: "Completed",
+      value: "0",
+      icon: chart,
+      bgColor: "bg-green-600",
+    },
+    {
+      title: "Avg.Delivery",
+      value: "24-72h",
+      icon: userIcon,
+      bgColor: "bg-violet-600",
+    },
+  ];
 
-// Data for action buttons
-const actionsData = [
-  {
-    icon: rocket,
-    text: "New Demo Request",
-    url: "/demorequest",
-  },
-  {
-    icon: dashboard,
-    text: "View Dashboard",
-    url: "/dashboard",
-  },
-  {
-    icon: contact,
-    text: "Contact Support",
-    url: "/contact",
-  },
-];
-  // Format date function
+  // Quick Actions
+  const actionsData = [
+    { icon: rocket, text: "New Demo Request", url: "/demorequest" },
+    { icon: dashboard, text: "View Dashboard", url: "/dashboard" },
+    { icon: contact, text: "Contact Support", url: "/contact" },
+  ];
+
+  // Format date
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
@@ -87,9 +81,19 @@ const actionsData = [
     navigate(url);
   };
 
+  // Update requests to display based on "view all" toggle
+  useEffect(() => {
+    if (viewall) {
+      setRequestToDisplay(uniqueDemoRequests);
+    } else {
+      setRequestToDisplay(uniqueDemoRequests?.slice(0, 3));
+    }
+  }, [viewall, uniqueDemoRequests]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 flex flex-col w-full gap-6 px-4 sm:px-6 py-6">
+        {/* Welcome */}
         <section className="flex flex-col">
           <h1 className="text-2xl sm:text-3xl md:text-4xl text-[#2F2F2F] font-medium tracking-tighter">
             Welcome back, {user?.username}!
@@ -99,7 +103,7 @@ const actionsData = [
           </p>
         </section>
 
-        {/* Stats Grid */}
+        {/* Stats */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {statsData.map((stat, index) => (
             <StatCard
@@ -112,24 +116,25 @@ const actionsData = [
           ))}
         </section>
 
-        {/* Projects Section - Updated */}
+        {/* Projects + Sidebar */}
         <section className="flex flex-col md:flex-row gap-6">
+          {/* Left: Recent Projects */}
           <div className="flex-1 bg-white rounded-lg shadow-sm p-4">
             <div className="flex justify-between mb-4">
               <h2 className="font-medium">Recent Projects</h2>
               {uniqueDemoRequests?.length > 0 && (
                 <button
                   className="text-[#EB6505] text-sm hover:text-orange-700 transition text-left"
-                  onClick={() => navigate("/projects")}
+                  onClick={() => setViewAll(!viewall)}
                 >
-                  View All
+                  {viewall ? "View Less" : "View All"}
                 </button>
               )}
             </div>
 
-            {uniqueDemoRequests?.length > 0 ? (
+            {Array.isArray(requestToDisplay) && requestToDisplay.length > 0 ? (
               <div className="space-y-4">
-                {uniqueDemoRequests.slice(0, 3).map((request) => (
+                {requestToDisplay.map((request) => (
                   <div
                     key={request.id}
                     className="border border-gray-100 rounded-lg p-4 hover:shadow-md transition cursor-pointer"
@@ -178,7 +183,7 @@ const actionsData = [
             )}
           </div>
 
-          {/* Quick Actions */}
+          {/* Right Sidebar */}
           <div className="md:w-[35%] flex flex-col gap-6">
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="font-medium py-2">Quick Actions</h2>
@@ -195,7 +200,6 @@ const actionsData = [
               </div>
             </div>
 
-            {/* Pro Tip */}
             <div className="bg-[#FFF6F0] rounded-lg p-4 border border-orange-100">
               <div className="flex gap-2 items-center font-medium text-orange-700">
                 <img src={bulb} alt="Tip" className="w-5 h-5" />
@@ -243,8 +247,5 @@ const ActionButton = ({ icon, text, isSelected, onClick }) => (
     <span>{text}</span>
   </button>
 );
-
-// Data for stats cards
-
 
 export default Dashboard;

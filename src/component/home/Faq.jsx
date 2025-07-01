@@ -32,7 +32,7 @@ const FAQ = () => {
   };
 
   return (
-    <main className="px-10 py-8 flex flex-col md:flex-row justify-center bg-[#F5F5F5] items-start gap-10">
+    <main className="px-4 sm:px-8 py-8 flex flex-col md:flex-row justify-center bg-[#F5F5F5] items-start gap-10">
       <div className="flex-1 flex flex-col gap-4">
         <p className="font-inter font-medium  text-4xl sm:text-6xl tracking-tighter text-[#2F2F2F]">
           Frequently <br /> Asked Question

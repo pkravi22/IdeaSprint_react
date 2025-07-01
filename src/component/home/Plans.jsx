@@ -7,47 +7,51 @@ const plans = [
     price: "$150",
     duration: "/month",
     badge: null,
+    category: "Perfect for early Validation",
     features: [
       "3-5 core screen",
-      "24-72 Hours delivery",
-      "Money Back Guarantee",
-      "Money Back Guarantee",
+      "Basic interactions",
+      "Mobile responsive",
+      "72-hour delivery",
     ],
   },
   {
     title: "Standard",
-    price: "$250",
+    price: "$300",
     duration: "/month",
     badge: null,
+    category: "Great For user Testing",
     features: [
-      "3-5 core screen",
-      "24-72 Hours delivery",
-      "Money Back Guarantee",
-      "Money Back Guarantee",
+      "8-10 screens",
+      "Advanced interactions",
+      "Custom animations",
+      "48-hour delivery",
     ],
   },
   {
     title: "Premium",
-    price: "$300",
+    price: "$500",
     duration: "/month",
     badge: "Most Popular",
+    category: "Ideal for pitching",
     features: [
-      "3-5 core screen",
-      "24-72 Hours delivery",
-      "Money Back Guarantee",
-      "Money Back Guarantee",
+      "15+ screens",
+      "Full user flow",
+      "Premium animations",
+      "24-hour delivery",
     ],
   },
   {
     title: "Investor Pack",
-    price: "$550",
+    price: "$750",
     duration: "/month",
     badge: null,
+    category: "Perfect for fundraising",
     features: [
-      "3-5 core screen",
-      "24-72 Hours delivery",
-      "Money Back Guarantee",
-      "Money Back Guarantee",
+      "Everything in Premium",
+      "Pitch deck integration",
+      "Analytics dashboard",
+      "Priority support",
     ],
   },
 ];
@@ -55,7 +59,7 @@ const plans = [
 function Plans() {
   return (
     <main className="bg-gray-200">
-      <div className="py-8 px-8 flex flex-col justify-center items-center gap-8">
+      <div className="py-8 px-4 sm:px-8 flex flex-col justify-center items-center gap-8">
         {/* Heading */}
         <div className="text-center">
           <h1 className="text-4xl tracking-tighter font-inter font-medium text-[#2F2F2F] mb-4">
@@ -68,7 +72,7 @@ function Plans() {
         </div>
 
         {/* Plan Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 justify-center bg-white p-12 rounded-xl items-center gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 justify-center bg-white p-6 rounded-xl items-center gap-6">
           {plans.map((plan, index) => (
             <div
               key={index}
@@ -88,9 +92,9 @@ function Plans() {
                 </p>
               </div>
               <div>
-                <p className="text-xl font-medium">{plan.title}</p>
+                <p className="text-xl text-black font-medium">{plan.title}</p>
                 <p className="font-inter tracking-tight text-[15px]">
-                  Perfect for early Validation
+                  {plan.category}
                 </p>
               </div>
               <div className="flex flex-col gap-1">

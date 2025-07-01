@@ -79,7 +79,7 @@ function Header() {
       </nav>
 
       {user ? (
-        <div className="flex items-center gap-4">
+        <div className="hidden sm:flex items-center gap-4">
           <div
             className="flex gap-2 items-center cursor-pointer"
             onClick={() => navigate("/dashboard")}

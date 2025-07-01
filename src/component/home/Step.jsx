@@ -23,13 +23,12 @@ function Steps() {
         </div>
       </div>
 
-      {/* Steps Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3  gap-8 p-6">
         {/* Step 1 */}
         <div className="flex flex-col items-start justify-center">
           <img src={mind} alt="Step 1" className="w-12 h-12" />
           <div className="text-[#EB6505]">Step 1</div>
-          <div className="text-xl font-medium text-[#2F2F2F] tracking-tighter">
+          <div className="text-3xl font-medium text-[#2F2F2F] tracking-tighter">
             Got an idea?
           </div>
         </div>
@@ -38,16 +37,16 @@ function Steps() {
         <div className="flex flex-col items-start justify-center">
           <img src={bulbColored} alt="Step 2" className="w-12 h-12" />
           <div className="text-[#EB6505]">Step 2</div>
-          <div className="text-xl font-medium text-[#2F2F2F] tracking-tighter">
+          <div className="text-3xl font-medium text-[#2F2F2F] tracking-tighter">
             Share Your Vision
           </div>
         </div>
 
         {/* Step 3 */}
-        <div className="flex flex-col items-start justify-center">
+        <div className="flex flex-col items-start justify-start">
           <img src={rocketColored} alt="Step 3" className="w-12 h-12" />
           <div className="text-[#EB6505]">Step 3</div>
-          <div className="text-xl font-medium text-[#2F2F2F] tracking-tighter">
+          <div className="text-3xl text-left  font-medium text-[#2F2F2F] tracking-tighter">
             We turn it into clickable prototype
           </div>
         </div>

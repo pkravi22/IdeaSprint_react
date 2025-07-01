@@ -29,7 +29,7 @@ const testimonials = [
 
 const FounderTestimonials = () => {
   return (
-    <main className="px-8 py-4 sm:py-18 flex flex-col justify-center items-center gap-8">
+    <main className="px-4 sm:px-8 py-4 sm:py-18 flex flex-col justify-center items-center gap-8">
       <div className="py-4 text-center">
         <h1 className="text-4xl tracking-tighter font-inter font-medium text-[#2F2F2F] mb-4">
           What Founders say

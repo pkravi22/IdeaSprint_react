@@ -13,6 +13,8 @@ import AuthPage from "./component/authpage/AuthPage";
 import DemoRequestForm from "./pages/DemoForm";
 import DemoSubmitSuccess from "./pages/DemoSubmitSuccess";
 import Payment from "./pages/Payment";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancelled from "./pages/PaymentCancelled";
 function App() {
   const [count, setCount] = useState(0);
 
@@ -25,6 +27,8 @@ function App() {
           <Route path="/authpage" element={<AuthPage />} />
 
           <Route path="/home" element={<Home />} />
+          <Route path="/success" element={<PaymentSuccess />} />
+          <Route path="/cancel" element={<PaymentCancelled />} />
 
           <Route path="/demorequest" element={<DemoRequestForm />} />
           <Route path="/dashboard" element={<DashBoard />} />

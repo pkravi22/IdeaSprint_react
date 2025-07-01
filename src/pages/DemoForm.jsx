@@ -2,7 +2,43 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import AuthModal from "../modals/AuthModal";
+import { MdOutlineCancel } from "react-icons/md";
+import { CiFileOn } from "react-icons/ci";
 
+// Cloudinary Upload Function
+// Updated Cloudinary Upload Function with better error handling
+async function uploadImageToCloudinary(file) {
+  console.log(`Uploading file: ${file.name} (${file.size} bytes)`);
+  const cloudName = "diubxvdpu";
+  const uploadPreset = "idea_sprint";
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", uploadPreset);
+
+  try {
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (!res.ok) {
+      // Get detailed error message from Cloudinary response
+      const errorData = await res.json();
+      const errorMsg = errorData.error?.message || "Unknown Cloudinary error";
+      throw new Error(`Cloudinary upload failed: ${res.status} - ${errorMsg}`);
+    }
+
+    const data = await res.json();
+    return data.secure_url;
+  } catch (err) {
+    console.error(`Cloudinary upload error for ${file.name}:`, err);
+    throw new Error(`Failed to upload ${file.name}: ${err.message}`);
+  }
+}
 const DemoRequestForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -10,6 +46,11 @@ const DemoRequestForm = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [files, setFiles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [coreFeatures, setCoreFeatures] = useState([""]);
+  const [featureError, setFeatureError] = useState("");
+  const [fileUploadProgress, setFileUploadProgress] = useState({});
+  const [fileUploadErrors, setFileUploadErrors] = useState({});
+
   const [formData, setFormData] = useState({
     Fullname: "",
     Email: "",
@@ -19,11 +60,6 @@ const DemoRequestForm = () => {
     DesignPreferences: "",
     Purpose: "",
     ShortDescriptionOfIdea: "",
-    coreFeatures: {
-      auth: false,
-      payment: false,
-      aiSuggestions: false,
-    },
     TotalMoney: "",
     Plan: "",
   });
@@ -75,6 +111,14 @@ const DemoRequestForm = () => {
     },
   ];
 
+  const purposeOptions = [
+    { value: "fundraising", label: "Fundraising" },
+    { value: "user-testing", label: "User Testing" },
+    { value: "pitch", label: "Pitch Presentation" },
+    { value: "development", label: "Development Reference" },
+    { value: "other", label: "Other" },
+  ];
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -83,44 +127,156 @@ const DemoRequestForm = () => {
 
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
-    setFiles(selectedFiles);
+    // Validate file size (10MB max)
+    const validFiles = selectedFiles.filter(
+      (file) => file.size <= 10 * 1024 * 1024
+    );
+
+    if (validFiles.length !== selectedFiles.length) {
+      setErrorMessage("Some files exceed 10MB limit and were not added");
+    }
+
+    setFiles((prevFiles) => [...prevFiles, ...validFiles]);
   };
 
-  const handleFeatureToggle = (feature) => {
-    setFormData({
-      ...formData,
-      coreFeatures: {
-        ...formData.coreFeatures,
-        [feature]: !formData.coreFeatures[feature],
-      },
+  const removeFile = (fileName) => {
+    setFiles(files.filter((file) => file.name !== fileName));
+    setFileUploadErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[fileName];
+      return newErrors;
     });
   };
 
+  const addFeature = () => {
+    if (coreFeatures.length < 5) {
+      setCoreFeatures([...coreFeatures, ""]);
+      setFeatureError("");
+    } else {
+      setFeatureError("Maximum 5 features allowed");
+    }
+  };
+
+  const handleFeatureChange = (index, value) => {
+    const updatedFeatures = [...coreFeatures];
+    updatedFeatures[index] = value;
+    setCoreFeatures(updatedFeatures);
+  };
+
+  const removeFeature = (index) => {
+    if (coreFeatures.length > 1) {
+      const updatedFeatures = [...coreFeatures];
+      updatedFeatures.splice(index, 1);
+      setCoreFeatures(updatedFeatures);
+    }
+  };
+
   const validateForm = () => {
-    if (!selectedPlan) {
-      setErrorMessage("Please select a plan");
+    if (!formData.Fullname.trim()) {
+      setErrorMessage("Full name is required");
       return false;
     }
 
-    if (
-      !formData.Fullname ||
-      !formData.Email ||
-      !formData.ProjectName ||
-      !formData.ShortDescription ||
-      !formData.ShortDescriptionOfIdea ||
-      !formData.TargetAudience ||
-      !formData.Purpose
-    ) {
-      setErrorMessage("Please fill all required fields");
+    if (!/^\S+@\S+\.\S+$/.test(formData.Email)) {
+      setErrorMessage("Valid email is required");
+      return false;
+    }
+
+    if (!formData.ProjectName.trim()) {
+      setErrorMessage("Project name is required");
+      return false;
+    }
+
+    if (!formData.ShortDescription.trim()) {
+      setErrorMessage("Short description is required");
+      return false;
+    }
+
+    if (!formData.TargetAudience.trim()) {
+      setErrorMessage("Target audience is required");
+      return false;
+    }
+
+    if (!formData.Purpose) {
+      setErrorMessage("Purpose is required");
+      return false;
+    }
+
+    if (!formData.ShortDescriptionOfIdea.trim()) {
+      setErrorMessage("Detailed description is required");
+      return false;
+    }
+
+    const validFeatures = coreFeatures.filter((f) => f.trim() !== "");
+    if (validFeatures.length < 3) {
+      setFeatureError("At least 3 core features are required");
+      return false;
+    }
+
+    if (!selectedPlan) {
+      setErrorMessage("Please select a plan");
       return false;
     }
 
     return true;
   };
 
+  const uploadFilesToCloudinary = async () => {
+    const fileUrls = [];
+    setFileUploadErrors({});
+
+    for (const file of files) {
+      try {
+        // File type validation
+        const validFileTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/gif",
+          "application/pdf",
+        ];
+        if (!validFileTypes.includes(file.type)) {
+          throw new Error(`Unsupported file type: ${file.type}`);
+        }
+
+        // File size validation
+        if (file.size > 10 * 1024 * 1024) {
+          throw new Error("File size exceeds 10MB limit");
+        }
+
+        setFileUploadProgress((prev) => ({
+          ...prev,
+          [file.name]: { status: "uploading", progress: 0 },
+        }));
+
+        const url = await uploadImageToCloudinary(file);
+        fileUrls.push(url);
+
+        setFileUploadProgress((prev) => ({
+          ...prev,
+          [file.name]: { status: "completed", progress: 100 },
+        }));
+      } catch (err) {
+        console.error(`Failed to upload ${file.name}:`, err);
+        setFileUploadErrors((prev) => ({
+          ...prev,
+          [file.name]: err.message || "Upload failed",
+        }));
+        setFileUploadProgress((prev) => ({
+          ...prev,
+          [file.name]: { status: "error", progress: 0 },
+        }));
+        throw new Error(`File upload failed: ${file.name}`);
+      }
+    }
+
+    return fileUrls;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setFeatureError("");
+    setFileUploadErrors({});
 
     if (!validateForm()) return;
 
@@ -143,28 +299,31 @@ const DemoRequestForm = () => {
       return;
     }
 
-    const payload = {
-      Fullname: formData.Fullname,
-      Email: formData.Email,
-      ProjectName: formData.ProjectName,
-      ShortDescription: formData.ShortDescription,
-      TargetAudience: formData.TargetAudience,
-      DesignPreferences: formData.DesignPreferences,
-      Purpose: formData.Purpose,
-      ShortDescriptionOfIdea: formData.ShortDescriptionOfIdea,
-      coreFeatures: {
-        auth: formData.coreFeatures.auth,
-        payment: formData.coreFeatures.payment,
-        aiSuggestions: formData.coreFeatures.aiSuggestions,
-      },
-      TotalMoney: String(plan.price),
-      Plan: plan.name,
-    };
-
     try {
+      let fileUrls = [];
+      if (files.length > 0) {
+        fileUrls = await uploadFilesToCloudinary();
+      }
+
+      const data = {
+        Fullname: formData.Fullname,
+        Email: formData.Email,
+        ProjectName: formData.ProjectName,
+        ShortDescription: formData.ShortDescription,
+        TargetAudience: formData.TargetAudience,
+        DesignPreferences: formData.DesignPreferences,
+        Purpose: formData.Purpose,
+        ShortDescriptionOfIdea: formData.ShortDescriptionOfIdea,
+        coreFeatures: coreFeatures.filter((f) => f.trim() !== ""),
+        TotalMoney: String(plan.price),
+        Plan: plan.name,
+
+        files: fileUrls.length > 0 ? fileUrls[0] : "",
+      };
+
       const res = await axios.post(
         "https://ideasprint-backend.onrender.com/api/demo-schemas",
-        { data: payload },
+        { data },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -174,17 +333,40 @@ const DemoRequestForm = () => {
       );
 
       console.log("Form submitted successfully:", res.data);
-      navigate("/payment");
+      navigate("/payment", {
+        state: {
+          amount: plan.price,
+          projectName: formData.ProjectName,
+          plan: plan.name,
+          demoRequestId: res.data.data.id, // Make sure your API returns an ID
+          customerEmail: formData.Email,
+          customerName: formData.Fullname,
+        },
+      });
     } catch (err) {
       console.error(
         "Error submitting form:",
         err.response ? err.response.data : err.message
       );
 
-      if (err.response?.data?.error?.message?.includes("must be unique")) {
-        setErrorMessage("This email is already registered");
+      // Handle Cloudinary upload errors
+      if (err.message.includes("File upload failed")) {
+        setErrorMessage(
+          "Some files failed to upload. Please check and try again."
+        );
+      }
+      // Handle Strapi validation errors
+      else if (err.response?.data?.error?.name === "ValidationError") {
+        const errors = err.response.data.error.details.errors;
+        const errorMessages = errors
+          .map((e) => `${e.path[0]}: ${e.message}`)
+          .join("\n");
+        setErrorMessage(`Validation failed:\n${errorMessages}`);
       } else {
-        setErrorMessage("Failed to submit form. Please try again.");
+        setErrorMessage(
+          err.response?.data?.error?.message ||
+            "Failed to submit form. Please try again."
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -258,7 +440,7 @@ const DemoRequestForm = () => {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   name="Fullname"
@@ -272,7 +454,7 @@ const DemoRequestForm = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
-                  Email
+                  Email *
                 </label>
                 <input
                   name="Email"
@@ -295,7 +477,7 @@ const DemoRequestForm = () => {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
-                  Project/Startup Name
+                  Project/Startup Name *
                 </label>
                 <input
                   name="ProjectName"
@@ -309,7 +491,7 @@ const DemoRequestForm = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
-                  Short Description
+                  Short Description *
                 </label>
                 <input
                   name="ShortDescription"
@@ -323,7 +505,7 @@ const DemoRequestForm = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
-                  Detailed Description
+                  Detailed Description *
                 </label>
                 <textarea
                   name="ShortDescriptionOfIdea"
@@ -336,7 +518,7 @@ const DemoRequestForm = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
-                  Target Audience
+                  Target Audience *
                 </label>
                 <textarea
                   name="TargetAudience"
@@ -350,52 +532,178 @@ const DemoRequestForm = () => {
             </div>
           </section>
 
-          {/* Predefined Features */}
+          {/* Core Features */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
-              Core Features
+              Core Features (3-5 Required)
             </h2>
             <div className="flex flex-col gap-3">
-              {Object.entries(formData.coreFeatures).map(
-                ([feature, checked]) => (
-                  <div key={feature} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id={feature}
-                      checked={checked}
-                      onChange={() => handleFeatureToggle(feature)}
-                      className="h-4 w-4 text-[#EB6505] rounded focus:ring-[#EB6505]"
-                    />
-                    <label
-                      htmlFor={feature}
-                      className="ml-2 text-gray-700 capitalize"
+              {coreFeatures.map((feature, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <input
+                    className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
+                    type="text"
+                    placeholder={`Feature ${index + 1}${index < 3 ? " *" : ""}`}
+                    value={feature}
+                    onChange={(e) => handleFeatureChange(index, e.target.value)}
+                    required={index < 3}
+                  />
+                  <button
+                    type="button"
+                    className="text-red-500 hover:text-red-700 p-2"
+                    onClick={() => removeFeature(index)}
+                    disabled={coreFeatures.length <= 3}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      {feature.replace(/([A-Z])/g, " $1")}
-                    </label>
-                  </div>
-                )
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+
+              {featureError && (
+                <div className="text-red-500 text-sm mt-1">{featureError}</div>
               )}
+
+              <button
+                type="button"
+                className={`w-full text-center py-2.5 rounded-xl text-sm sm:text-base font-medium ${
+                  coreFeatures.length >= 5
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#EB6505] text-white hover:bg-[#d45c04]"
+                }`}
+                onClick={addFeature}
+                disabled={coreFeatures.length >= 5}
+              >
+                {coreFeatures.length >= 5
+                  ? "Maximum 5 features"
+                  : "Add Feature"}
+              </button>
             </div>
           </section>
 
           {/* Design Preferences */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
-              Design Preferences
+              Design References
             </h2>
             <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-1">
-                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
-                  Preferred UI Look
+              <div className="flex-col gap-2 border border-gray-300 rounded-md text-gray-500 flex justify-center items-center p-6 text-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-gray-400 mb-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
+                </svg>
+                <p className="text-gray-500 text-sm sm:text-base">
+                  Upload logos, sketches, or design references
+                </p>
+
+                {/* Upload Input */}
+                <label className="cursor-pointer border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg px-6 py-2 mt-3 text-sm sm:text-base">
+                  Choose Files
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                  />
                 </label>
-                <textarea
-                  name="DesignPreferences"
-                  value={formData.DesignPreferences}
-                  onChange={handleChange}
-                  className="border border-gray-300 rounded-md text-gray-600 px-4 py-3 h-24 text-sm sm:text-base"
-                  placeholder="Describe your preferred colors, styles or reference websites"
-                ></textarea>
+
+                <p className="text-gray-400 text-xs mt-2">
+                  Maximum file size: 10MB per file
+                </p>
               </div>
+
+              {/* Show uploaded files */}
+              {files.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">
+                    Uploaded Files:
+                  </h3>
+                  <ul className="text-sm text-gray-600 flex flex-col gap-2">
+                    {files.map((file, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center gap-2 bg-gray-50 p-2 rounded"
+                      >
+                        <CiFileOn className="text-gray-500 flex-shrink-0" />
+                        <span className="truncate flex-grow">{file.name}</span>
+
+                        {/* Upload status indicators */}
+                        {fileUploadProgress[file.name]?.status ===
+                          "uploading" && (
+                          <div className="flex items-center text-xs text-blue-500">
+                            <svg
+                              className="animate-spin -ml-1 mr-1 h-4 w-4 text-blue-500"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                            Uploading...
+                          </div>
+                        )}
+
+                        {fileUploadProgress[file.name]?.status ===
+                          "completed" && (
+                          <span className="text-xs text-green-500">
+                            ✓ Uploaded
+                          </span>
+                        )}
+
+                        {fileUploadErrors[file.name] && (
+                          <span className="text-xs text-red-500">
+                            {fileUploadErrors[file.name]}
+                          </span>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => removeFile(file.name)}
+                          className="text-red-500 hover:text-red-700 p-1"
+                          aria-label={`Remove file ${file.name}`}
+                        >
+                          <MdOutlineCancel />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </section>
 
@@ -406,17 +714,26 @@ const DemoRequestForm = () => {
             </h2>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <label className="font-medium text-[#2F2F2F] text-sm sm:text-base">
-                  What will you use this demo for?
+                <label
+                  htmlFor="Purpose"
+                  className="font-medium text-[#2F2F2F] text-sm sm:text-base"
+                >
+                  What will you use this demo for? *
                 </label>
-                <input
+                <select
                   name="Purpose"
                   value={formData.Purpose}
                   onChange={handleChange}
                   className="border border-gray-300 rounded-md text-gray-600 w-full px-4 py-3 text-sm sm:text-base"
-                  placeholder="Purpose of this demo"
                   required
-                />
+                >
+                  <option value="">Select purpose</option>
+                  {purposeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </section>
@@ -424,7 +741,7 @@ const DemoRequestForm = () => {
           {/* Plan Selection */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
-              Plan Selection
+              Plan Selection *
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {plans.map((plan) => (
@@ -487,7 +804,7 @@ const DemoRequestForm = () => {
                 <button
                   type="submit"
                   className="bg-[#EB6505] hover:bg-[#d45c04] rounded-3xl px-6 py-3 text-white font-medium text-base w-full sm:w-auto transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                  disabled={!selectedPlan || isSubmitting}
+                  disabled={isSubmitting}
                 >
                   {isSubmitting ? (
                     <div className="flex items-center justify-center">
@@ -540,7 +857,7 @@ const DemoRequestForm = () => {
       </main>
 
       {isModalOpen && (
-        <div className=" w-full min-h-screen bg-white  absolute flex justify-center items-center top-0 ">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <AuthModal
             errorMessage={errorMessage}
             setIsModalOpen={setIsModalOpen}

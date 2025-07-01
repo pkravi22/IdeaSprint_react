@@ -23,11 +23,11 @@ function Header() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        login(response.data); // Update context with user data
+        login(response.data); 
         console.log("User fetched:", response.data);
       } catch (e) {
         console.log("Error fetching user:", e);
-        logout(); // Clear user data if fetch fails
+        logout(); 
       }
     };
 

@@ -28,3 +28,18 @@ export const signin = async (credentials) => {
     return { error: error?.response?.data };
   }
 };
+
+const payment = async (data) => {
+  console.log(data);
+
+  try {
+    const res = await axios.post(`${BASE_URL}/transactions/checkout`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return { success: true, payment: res.data };
+  } catch (error) {
+    return { success: false, error: error.response.data };
+  }
+};

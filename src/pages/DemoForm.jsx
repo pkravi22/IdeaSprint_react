@@ -4,6 +4,7 @@ import axios from "axios";
 import AuthModal from "../modals/AuthModal";
 import { MdOutlineCancel } from "react-icons/md";
 import { CiFileOn } from "react-icons/ci";
+import { useUser } from "../context/userContext";
 
 // Cloudinary Upload Function
 // Updated Cloudinary Upload Function with better error handling
@@ -50,10 +51,13 @@ const DemoRequestForm = () => {
   const [featureError, setFeatureError] = useState("");
   const [fileUploadProgress, setFileUploadProgress] = useState({});
   const [fileUploadErrors, setFileUploadErrors] = useState({});
-
+  const { user } = useUser();
+  console.log(user);
+  const { username, email } = user;
+  console.log(username, email);
   const [formData, setFormData] = useState({
-    Fullname: "",
-    Email: "",
+    Fullname: username,
+    Email: email,
     ProjectName: "",
     ShortDescription: "",
     TargetAudience: "",

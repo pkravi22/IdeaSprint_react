@@ -44,8 +44,8 @@ const Payment = () => {
       const response = await axios.post(
         `${backendUrl}/api/transactions/checkout`,
         {
-          amount: amountInSmallestUnit,
-          currency: "inr",
+          amount: amount,
+          currency: "usd",
           receiptEmail: customerEmail,
           demoSchemaId: demoRequestId,
         },
@@ -111,7 +111,7 @@ const Payment = () => {
             <div className="flex justify-between pt-2 border-t border-gray-200">
               <span className="text-gray-600 font-semibold">Total:</span>
               <span className="text-xl font-bold text-[#EB6505]">
-                ₹{amount}
+                ${amount}
               </span>
             </div>
           </div>

@@ -68,23 +68,23 @@ const DemoRequestForm = () => {
     {
       id: "basic",
       name: "Basic",
-      price: 300,
+      price: 150,
       features: [
-        "Money Back Guarantee",
         "3-5 Interactive Screens",
-        "Basic UI Design",
-        "1 Round of Revisions",
+        "Basic interaction",
+        "Mobile responsive",
+        "72-hour delivery",
       ],
     },
     {
       id: "standard",
       name: "Standard",
-      price: 400,
+      price: 300,
       features: [
-        "Everything in Basic",
-        "5-8 Interactive Screens",
-        "Enhanced UI Design",
-        "2 Rounds of Revisions",
+        "8-10 screens",
+        "Advanced interactions",
+        "Custom animations",
+        "48-hour delivery",
       ],
     },
     {
@@ -92,10 +92,10 @@ const DemoRequestForm = () => {
       name: "Premium",
       price: 500,
       features: [
-        "Everything in Standard",
-        "8-12 Interactive Screens",
-        "Custom UI Design",
-        "3 Rounds of Revisions",
+        "15+ screens",
+        "Full user flow",
+        "Premium animations",
+        "24-hour delivery",
       ],
     },
     {
@@ -532,7 +532,6 @@ const DemoRequestForm = () => {
             </div>
           </section>
 
-          {/* Core Features */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
               Core Features (3-5 Required)
@@ -593,7 +592,6 @@ const DemoRequestForm = () => {
             </div>
           </section>
 
-          {/* Design Preferences */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
               Design References
@@ -618,12 +616,10 @@ const DemoRequestForm = () => {
                   Upload logos, sketches, or design references
                 </p>
 
-                {/* Upload Input */}
                 <label className="cursor-pointer border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg px-6 py-2 mt-3 text-sm sm:text-base">
-                  Choose Files
+                  Choose File
                   <input
                     type="file"
-                    multiple
                     onChange={handleFileChange}
                     className="hidden"
                     accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
@@ -635,7 +631,6 @@ const DemoRequestForm = () => {
                 </p>
               </div>
 
-              {/* Show uploaded files */}
               {files.length > 0 && (
                 <div className="mt-4">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">
@@ -707,7 +702,6 @@ const DemoRequestForm = () => {
             </div>
           </section>
 
-          {/* Purpose */}
           <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
               Purpose

@@ -13,11 +13,19 @@ import { useUser } from "../context/userContext.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const username = JSON.parse(localStorage.getItem("user"));
   const [selectedButton, setSelectedButton] = useState("New Demo Request");
   const { user } = useUser();
+  console.log(user);
   const token = localStorage.getItem("token");
   const [viewall, setViewAll] = useState(false);
   const [requestToDisplay, setRequestToDisplay] = useState([]);
+  useEffect(() => {
+    // Redirect to login if no token is present
+    if (!token) {
+      navigate("/authpage");
+    }
+  }, [token, navigate]);
 
   // Safely calculate unique demo requests
   const uniqueDemoRequests = useMemo(() => {
@@ -93,10 +101,9 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 flex flex-col w-full gap-6 px-4 sm:px-6 py-6">
-        {/* Welcome */}
         <section className="flex flex-col">
           <h1 className="text-2xl sm:text-3xl md:text-4xl text-[#2F2F2F] font-medium tracking-tighter">
-            Welcome back, {user?.username}!
+            Welcome back, {username}!
           </h1>
           <p className="text-gray-400 text-sm sm:text-base mt-1 sm:mt-2">
             Track your demo projects and explore new opportunities
@@ -116,9 +123,7 @@ const Dashboard = () => {
           ))}
         </section>
 
-        {/* Projects + Sidebar */}
         <section className="flex flex-col md:flex-row gap-6">
-          {/* Left: Recent Projects */}
           <div className="flex-1 bg-white rounded-lg shadow-sm p-4">
             <div className="flex justify-between mb-4">
               <h2 className="font-medium">Recent Projects</h2>

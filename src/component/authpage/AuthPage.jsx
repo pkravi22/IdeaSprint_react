@@ -65,6 +65,9 @@ const AuthPage = () => {
       console.log(res);
       if (res.success) {
         localStorage.setItem("token", res.user.jwt);
+        localStorage.setItem("user", JSON.stringify(res.user.user.username));
+        localStorage.setItem("email", res.user.user.email);
+        
         navigate("/home");
       } else {
         throw new Error(res.error.message || "Signin failed");
@@ -110,7 +113,7 @@ const AuthPage = () => {
               Create your account or sign in to start building your MVP
             </p>
           </div>
-          <div className="flex flex-col-reverse md:flex-row gap-12 w-screen md:w-[840px]">
+          <div className="flex flex-col md:flex-row gap-12 w-screen md:w-[840px]">
             <div className="flex-1 p-4">
               <header className="flex justify-around shadow-md rounded-md px-2 py-2 gap-4">
                 <button

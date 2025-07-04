@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import AuthModal from "../modals/AuthModal";
@@ -7,9 +7,7 @@ import { CiFileOn } from "react-icons/ci";
 import { useUser } from "../context/userContext";
 
 // Cloudinary Upload Function
-// Updated Cloudinary Upload Function with better error handling
 async function uploadImageToCloudinary(file) {
-  console.log(`Uploading file: ${file.name} (${file.size} bytes)`);
   const cloudName = "diubxvdpu";
   const uploadPreset = "idea_sprint";
 
@@ -27,7 +25,6 @@ async function uploadImageToCloudinary(file) {
     );
 
     if (!res.ok) {
-      // Get detailed error message from Cloudinary response
       const errorData = await res.json();
       const errorMsg = errorData.error?.message || "Unknown Cloudinary error";
       throw new Error(`Cloudinary upload failed: ${res.status} - ${errorMsg}`);
@@ -40,6 +37,7 @@ async function uploadImageToCloudinary(file) {
     throw new Error(`Failed to upload ${file.name}: ${err.message}`);
   }
 }
+
 const DemoRequestForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,9 +50,11 @@ const DemoRequestForm = () => {
   const [fileUploadProgress, setFileUploadProgress] = useState({});
   const [fileUploadErrors, setFileUploadErrors] = useState({});
   const { user } = useUser();
-  console.log(user);
+
+  // Create ref for core features section
+  const featuresSectionRef = useRef(null);
+
   const { username, email } = user;
-  console.log(username, email);
   const [formData, setFormData] = useState({
     Fullname: username,
     Email: email,
@@ -131,7 +131,6 @@ const DemoRequestForm = () => {
 
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
-    // Validate file size (10MB max)
     const validFiles = selectedFiles.filter(
       (file) => file.size <= 10 * 1024 * 1024
     );
@@ -214,6 +213,29 @@ const DemoRequestForm = () => {
     const validFeatures = coreFeatures.filter((f) => f.trim() !== "");
     if (validFeatures.length < 3) {
       setFeatureError("At least 3 core features are required");
+
+      // Scroll to features section and highlight it
+      if (featuresSectionRef.current) {
+        featuresSectionRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+
+        // Add visual highlight
+        featuresSectionRef.current.classList.add(
+          "border-orange-500",
+          "bg-orange-50"
+        );
+        setTimeout(() => {
+          if (featuresSectionRef.current) {
+            featuresSectionRef.current.classList.remove(
+              "border-orange-500",
+              "bg-orange-50"
+            );
+          }
+        }, 3000);
+      }
+
       return false;
     }
 
@@ -231,7 +253,6 @@ const DemoRequestForm = () => {
 
     for (const file of files) {
       try {
-        // File type validation
         const validFileTypes = [
           "image/jpeg",
           "image/png",
@@ -242,7 +263,6 @@ const DemoRequestForm = () => {
           throw new Error(`Unsupported file type: ${file.type}`);
         }
 
-        // File size validation
         if (file.size > 10 * 1024 * 1024) {
           throw new Error("File size exceeds 10MB limit");
         }
@@ -321,7 +341,6 @@ const DemoRequestForm = () => {
         coreFeatures: coreFeatures.filter((f) => f.trim() !== ""),
         TotalMoney: String(plan.price),
         Plan: plan.name,
-
         files: fileUrls.length > 0 ? fileUrls[0] : "",
       };
 
@@ -336,13 +355,12 @@ const DemoRequestForm = () => {
         }
       );
 
-      console.log("Form submitted successfully:", res.data);
       navigate("/payment", {
         state: {
           amount: plan.price,
           projectName: formData.ProjectName,
           plan: plan.name,
-          demoRequestId: res.data.data.id, // Make sure your API returns an ID
+          demoRequestId: res.data.data.id,
           customerEmail: formData.Email,
           customerName: formData.Fullname,
         },
@@ -353,14 +371,11 @@ const DemoRequestForm = () => {
         err.response ? err.response.data : err.message
       );
 
-      // Handle Cloudinary upload errors
       if (err.message.includes("File upload failed")) {
         setErrorMessage(
           "Some files failed to upload. Please check and try again."
         );
-      }
-      // Handle Strapi validation errors
-      else if (err.response?.data?.error?.name === "ValidationError") {
+      } else if (err.response?.data?.error?.name === "ValidationError") {
         const errors = err.response.data.error.details.errors;
         const errorMessages = errors
           .map((e) => `${e.path[0]}: ${e.message}`)
@@ -536,7 +551,11 @@ const DemoRequestForm = () => {
             </div>
           </section>
 
-          <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          {/* Core Features Section with ref */}
+          <section
+            ref={featuresSectionRef}
+            className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 transition-all duration-300"
+          >
             <h2 className="text-[#EB6505] text-lg sm:text-xl font-semibold uppercase mb-4">
               Core Features (3-5 Required)
             </h2>
@@ -553,7 +572,11 @@ const DemoRequestForm = () => {
                   />
                   <button
                     type="button"
-                    className="text-red-500 hover:text-red-700 p-2"
+                    className={`text-red-500 hover:text-red-700 p-2 ${
+                      coreFeatures.length <= 3
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
                     onClick={() => removeFeature(index)}
                     disabled={coreFeatures.length <= 3}
                   >
@@ -627,6 +650,7 @@ const DemoRequestForm = () => {
                     onChange={handleFileChange}
                     className="hidden"
                     accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                    multiple
                   />
                 </label>
 
@@ -649,7 +673,6 @@ const DemoRequestForm = () => {
                         <CiFileOn className="text-gray-500 flex-shrink-0" />
                         <span className="truncate flex-grow">{file.name}</span>
 
-                        {/* Upload status indicators */}
                         {fileUploadProgress[file.name]?.status ===
                           "uploading" && (
                           <div className="flex items-center text-xs text-blue-500">

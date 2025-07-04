@@ -7,7 +7,6 @@ function Hero() {
   return (
     <main>
       <div className="bg-[#EB6505] md:min-h-screen flex flex-col md:flex-row gap-8 px-8 py-12">
-        {/* Left Section */}
         <div className="flex-1 flex flex-col h-full justify-center">
           <h1 className="text-4xl md:text-7xl font-inter font-medium tracking-tighter text-white mb-4">
             Get Your <br />
@@ -54,12 +53,11 @@ function Hero() {
           </div>
         </div>
 
-        {/* Right Section - Hero Image */}
         <div className="flex-1 flex items-center justify-center">
           <img
             src={hero}
             alt="hero"
-            className="w-[300px] sm:w-[400px] md:w-[500px] h-[300px] sm:h-[400px] md:h-[500px] object-cover rounded-3xl"
+            className="w-[300px] sm:w-[400px] md:w-[500px] xl:w-[650px] h-[300px] sm:h-[400px] md:h-[500px] object-cover rounded-3xl"
           />
         </div>
       </div>

@@ -75,7 +75,7 @@ const Dashboard = () => {
   const actionsData = [
     { icon: rocket, text: "New Demo Request", url: "/demorequest" },
     { icon: dashboard, text: "View Dashboard", url: "/dashboard" },
-    { icon: contact, text: "Contact Support", url: "/contact" },
+    { icon: contact, text: "Contact Support", url: "/" },
   ];
 
   // Format date

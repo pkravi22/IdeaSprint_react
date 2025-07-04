@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import AuthModal from "../modals/AuthModal";
@@ -6,7 +6,6 @@ import { MdOutlineCancel } from "react-icons/md";
 import { CiFileOn } from "react-icons/ci";
 import { useUser } from "../context/userContext";
 
-// Cloudinary Upload Function
 async function uploadImageToCloudinary(file) {
   const cloudName = "diubxvdpu";
   const uploadPreset = "idea_sprint";
@@ -50,8 +49,17 @@ const DemoRequestForm = () => {
   const [fileUploadProgress, setFileUploadProgress] = useState({});
   const [fileUploadErrors, setFileUploadErrors] = useState({});
   const { user } = useUser();
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
-  // Create ref for core features section
+  useEffect(() => {
+    scrollToTop();
+  }, []);
+
   const featuresSectionRef = useRef(null);
 
   const { username, email } = user;
@@ -214,7 +222,6 @@ const DemoRequestForm = () => {
     if (validFeatures.length < 3) {
       setFeatureError("At least 3 core features are required");
 
-      // Scroll to features section and highlight it
       if (featuresSectionRef.current) {
         featuresSectionRef.current.scrollIntoView({
           behavior: "smooth",

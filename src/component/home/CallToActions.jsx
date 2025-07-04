@@ -1,6 +1,8 @@
 import React from "react";
 import { airplane } from "../../constants/ImagePath.js"; // Importing airplane image from constants
+import { useNavigate } from "react-router";
 const CallToAction = () => {
+  const navigate = useNavigate();
   return (
     <main className="px-4 sm:px-8 py-8">
       <div className="relative max-w-[1300px] bg-[#EB6505] min-h-48 w-full rounded-3xl">
@@ -17,7 +19,10 @@ const CallToAction = () => {
             </p>
           </div>
           <div>
-            <button className="bg-white text-[#EB6505] text-sm font-medium px-4 py-1 rounded-3xl">
+            <button
+              onClick={() => navigate("/demorequest")}
+              className="bg-white text-[#EB6505] text-sm font-medium px-4 py-1 rounded-3xl"
+            >
               Start My Demo Now
             </button>
           </div>

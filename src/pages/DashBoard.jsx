@@ -205,8 +205,8 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="bg-[#FFF6F0] rounded-lg p-4 border border-orange-100">
-              <div className="flex gap-2 items-center font-medium text-orange-700">
+            <div className="bg-white rounded-lg p-4 shadow-md ">
+              <div className="flex gap-2 items-center font-medium text-black tracking-tighter">
                 <img src={bulb} alt="Tip" className="w-5 h-5" />
                 Pro Tip
               </div>
@@ -222,7 +222,6 @@ const Dashboard = () => {
   );
 };
 
-// Stat Card Component
 const StatCard = ({ title, value, icon, bgColor }) => (
   <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition">
     <div>
@@ -235,7 +234,7 @@ const StatCard = ({ title, value, icon, bgColor }) => (
   </div>
 );
 
-// Action Button Component
+
 const ActionButton = ({ icon, text, isSelected, onClick }) => (
   <button
     onClick={onClick}

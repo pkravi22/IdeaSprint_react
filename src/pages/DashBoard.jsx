@@ -14,6 +14,8 @@ import { useUser } from "../context/userContext.jsx";
 const Dashboard = () => {
   const navigate = useNavigate();
   const username = JSON.parse(localStorage.getItem("user"));
+  const [modalDetails, setModalDetails] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
   const [selectedButton, setSelectedButton] = useState("New Demo Request");
   const { user } = useUser();
   console.log(user);
@@ -98,8 +100,56 @@ const Dashboard = () => {
     }
   }, [viewall, uniqueDemoRequests]);
 
+  const handleModalopen = (request) => {
+    console.log(request);
+    setModalOpen(true);
+    setModalDetails(request);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-96 max-w-md">
+            <h2 className="text-lg font-medium mb-0">Demo Request Details</h2>
+            <p className="text-gray-600 mb-4">
+              Here you can view the details of your demo request.
+            </p>
+            {modalDetails && (
+              <div className="space-y-2">
+                <p>
+                  <strong>Project Name:</strong> {modalDetails.ProjectName}
+                </p>
+                <p>
+                  <strong>Plan:</strong> {modalDetails.Plan}
+                </p>
+                <p>
+                  <strong>Paid amount:</strong> {modalDetails.TotalMoney}
+                </p>
+                <p>
+                  <strong>Status:</strong>{" "}
+                  {modalDetails.Demo_status || "pending"}
+                </p>
+                <p>
+                  <strong>Short Description:</strong>{" "}
+                  {modalDetails.ShortDescription}
+                </p>
+                <p>
+                  <strong>Created At:</strong>{" "}
+                  {formatDate(modalDetails.createdAt)}
+                </p>
+              </div>
+            )}
+            <button
+              className="bg-[#EB6505] mt-4 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition"
+              onClick={() => setModalOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       <main className="flex-1 flex flex-col w-full gap-6 px-4 sm:px-6 py-6">
         <section className="flex flex-col">
           <h1 className="text-2xl sm:text-3xl md:text-4xl text-[#2F2F2F] font-medium tracking-tighter">
@@ -143,7 +193,7 @@ const Dashboard = () => {
                   <div
                     key={request.id}
                     className="border border-gray-100 rounded-lg p-4 hover:shadow-md transition cursor-pointer"
-                    onClick={() => navigate(`/projects/${request.id}`)}
+                    onClick={() => handleModalopen(request)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -234,7 +284,6 @@ const StatCard = ({ title, value, icon, bgColor }) => (
   </div>
 );
 
-
 const ActionButton = ({ icon, text, isSelected, onClick }) => (
   <button
     onClick={onClick}
@@ -253,3 +302,5 @@ const ActionButton = ({ icon, text, isSelected, onClick }) => (
 );
 
 export default Dashboard;
+
+

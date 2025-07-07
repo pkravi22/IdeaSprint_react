@@ -76,7 +76,7 @@ const Footer = () => {
       <div className="flex flex-col gap-8 md:flex-row">
         {/* Left Section */}
         <div className="flex-2">
-          <div className="w-1/2 flex flex-col gap-4 pl-2 md:pl-8">
+          <div className="w-full sm:w-2/3 flex flex-col gap-4 pl-2 md:pl-8">
             <p className="text-orange-500 text-3xl font-medium">IdeaSprint.</p>
             <p className="text-white text-md">
               Building professional startup demos in 24-72 hours. Help founders

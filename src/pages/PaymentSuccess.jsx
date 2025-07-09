@@ -86,18 +86,17 @@ const PaymentSuccess = () => {
                 Copy Receipt Link
               </button>
             </div>
+            {showHelp && (
+              <div className="mt-6 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative">
+                <strong className="font-bold">Note:</strong>
+                <span className="block sm:inline ml-1">
+                  After the receipt opens, press <b>Ctrl + P</b> (or{" "}
+                  <b>Cmd + P</b> on Mac), then choose <b>"Save as PDF"</b> to
+                  download it.
+                </span>
+              </div>
+            )}
           </>
-        )}
-
-        {/* Simple Help Modal */}
-        {showHelp && (
-          <div className="mt-6 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative">
-            <strong className="font-bold">Note:</strong>
-            <span className="block sm:inline ml-1">
-              After the receipt opens, press <b>Ctrl + P</b> (or <b>Cmd + P</b>{" "}
-              on Mac), then choose <b>"Save as PDF"</b> to download it.
-            </span>
-          </div>
         )}
       </div>
     </div>

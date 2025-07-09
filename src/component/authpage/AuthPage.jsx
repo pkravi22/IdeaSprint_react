@@ -63,14 +63,15 @@ const AuthPage = () => {
     try {
       const res = await signin({ identifier, password });
       console.log(res);
+      console.log(res.error?.error.message);
       if (res.success) {
         localStorage.setItem("token", res.user.jwt);
         localStorage.setItem("user", JSON.stringify(res.user.user.username));
         localStorage.setItem("email", res.user.user.email);
-        
+
         navigate("/home");
       } else {
-        throw new Error(res.error.message || "Signin failed");
+        throw new Error(res.error.error.message || "Signin failed");
       }
     } catch (error) {
       alert(error.message || "Signin failed");

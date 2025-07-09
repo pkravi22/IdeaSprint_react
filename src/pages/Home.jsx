@@ -8,6 +8,7 @@ import FAQ from "../component/home/Faq";
 import CallToAction from "../component/home/CallToActions";
 import Footer from "../component/footer/Footer";
 import { getUser } from "../services/Authservices";
+import ProjectsShowcase from "../component/home/ProjectShowCase";
 
 const Home = () => {
   const token = localStorage.getItem("token");
@@ -37,6 +38,9 @@ const Home = () => {
       </div>
       <div id="pricing">
         <Plans />
+      </div>
+      <div id="projects">
+        <ProjectsShowcase />
       </div>
       <div id="testimonials">
         <FounderTestimonials />

@@ -33,10 +33,10 @@ const ContactSupport = () => {
       <main className="flex justify-center items-center py-12">
         <div className="flex flex-col gap-8 justify-center items-center">
           <div className="text-center flex flex-col gap-2 px-2">
-            <h1 className="text-3xl md:text-6xl text-[#2F2F2F] font-inter font-medium tracking-tighter">
+            <h1 className="text-3xl md:text-4xl text-[#2F2F2F] font-inter font-medium tracking-tighter">
               Contact Support
             </h1>
-            <p className="text-gray-600 p-4 text-md tracking-tighter">
+            <p className="text-gray-800 p-2 text-md">
               Need help? Reach out to our team and we’ll get back to you
               shortly.
             </p>
@@ -45,11 +45,11 @@ const ContactSupport = () => {
           <div className="flex flex-col md:flex-row gap-12 w-screen md:w-[840px]">
             <div className="flex-1 p-4">
               {isSubmitted ? (
-                <div className="flex flex-col items-center justify-center text-center gap-4 p-8 shadow-md rounded-md bg-green-50">
-                  <h2 className="text-2xl font-semibold text-green-700">
+                <div className="flex flex-col items-center justify-center text-center gap-4 p-8 shadow-md rounded-md bg-white">
+                  <h2 className="text-2xl text-[#2F2F2F] font-inter font-medium tracking-tight">
                     We've got your message!
                   </h2>
-                  <p className="text-gray-700 text-md max-w-md">
+                  <p className="text-gray-400 text-md max-w-md">
                     Thank you for contacting us. Our support team will review
                     your query and reach out to you within a few hours. Stay
                     connected!
@@ -112,7 +112,6 @@ const ContactSupport = () => {
                     />
                   </div>
 
-                  {/* Hidden inputs */}
                   <input type="hidden" name="_captcha" value="false" />
 
                   <button
@@ -125,7 +124,6 @@ const ContactSupport = () => {
               )}
             </div>
 
-            {/* Right Side Content */}
             <div className="flex-1 flex flex-col gap-4 p-4">
               <h2 className="text-3xl text-[#2F2F2F] font-inter font-medium tracking-tight">
                 We're here to help!

@@ -21,7 +21,7 @@ function Steps() {
         <div>
           <button
             onClick={() => navigate("/demorequest")}
-            className="bg-[#EB6505] px-4 py-2 rounded-3xl text-white font-medium"
+            className="bg-[#EB6505] cursor-pointer px-4 py-2 rounded-3xl text-white font-medium"
           >
             Start Your Project Today
           </button>

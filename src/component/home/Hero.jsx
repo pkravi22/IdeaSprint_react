@@ -26,11 +26,19 @@ function Hero() {
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
             <button
               onClick={() => navigate("/demorequest")}
-              className="px-4 md:px-12 py-2 bg-white text-[#EB6505] rounded-full"
+              className=" cursor-pointer px-4 md:px-12 py-2 bg-white text-[#EB6505] rounded-full"
             >
               Start My Demo
             </button>
-            <button className="px-4 md:px-12 py-2 text-white border border-white rounded-full">
+            <button
+              onClick={() => {
+                const el = document.getElementById("projects");
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className=" cursor-pointer px-4 md:px-12 py-2 text-white border border-white rounded-full"
+            >
               View Examples
             </button>
           </div>

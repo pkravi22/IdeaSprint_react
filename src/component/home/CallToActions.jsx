@@ -21,14 +21,13 @@ const CallToAction = () => {
           <div>
             <button
               onClick={() => navigate("/demorequest")}
-              className="bg-white text-[#EB6505] text-sm font-medium px-4 py-1 rounded-3xl"
+              className="bg-white cursor-pointer text-[#EB6505] text-sm font-medium px-4 py-1 rounded-3xl"
             >
               Start My Demo Now
             </button>
           </div>
         </div>
 
-        {/* Airplane Image */}
         <div className="absolute -top-8 right-0 hidden md:block">
           <img src={airplane} alt="airplane" className="w-[800px] h-[300px]" />
         </div>

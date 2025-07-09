@@ -7,7 +7,7 @@ const PaymentSuccess = () => {
   const sessionId = searchParams.get("session_id");
   const [status, setStatus] = useState("Verifying...");
   const [receiptUrl, setReceiptUrl] = useState(null);
-  const [showHelp, setShowHelp] = useState(false);
+  const [showHelp, setShowHelp] = useState(true);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const PaymentSuccess = () => {
   };
 
   const handleDownloadHelp = () => {
-    setShowHelp(true); // show instructions
+    // setShowHelp(true); // show instructions
     setTimeout(() => {
       window.open(receiptUrl, "_blank"); // open receipt
     }, 1000); // delay slightly for UX clarity
@@ -56,7 +56,7 @@ const PaymentSuccess = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-green-50 px-4">
       <div className="bg-white p-8 shadow-lg rounded-md max-w-md w-full text-center">
-        <h2 className="text-xl font-bold text-green-700 mb-4">{status}</h2>
+        <h2 className="text-xl font-semibold text-green-700 mb-4">{status}</h2>
 
         {receiptUrl && (
           <>
@@ -67,7 +67,7 @@ const PaymentSuccess = () => {
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => window.open(receiptUrl, "_blank")}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                className="bg-orange-400 hover:bg-orange-500 text-white font-semibold py-2 px-4 rounded"
               >
                 View Receipt
               </button>

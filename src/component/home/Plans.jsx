@@ -58,14 +58,14 @@ const plans = [
 
 function Plans() {
   return (
-    <main className="bg-gray-200">
+    <main className="bg-gray-100">
       <div className="py-8 px-4 sm:px-8 flex flex-col justify-center items-center gap-8">
         {/* Heading */}
         <div className="text-center">
           <h1 className="text-4xl tracking-tighter font-inter font-medium text-[#2F2F2F] mb-4">
             Choose Your Plan
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-[18px]">
             Professional demos tailored to your <br />
             needs and budget
           </p>

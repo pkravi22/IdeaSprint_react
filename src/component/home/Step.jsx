@@ -1,8 +1,10 @@
 import React from "react";
 
 import { mind, bulbColored, rocketColored } from "../../constants/ImagePath.js"; // Importing images from constants
+import { useNavigate } from "react-router";
 
 function Steps() {
+  const navigate = useNavigate();
   return (
     <main className="flex flex-col gap-10 py-20 justify-center items-center text-center">
       {/* Heading Section */}
@@ -11,13 +13,16 @@ function Steps() {
           <h1 className="text-3xl text-[#2F2F2F] font-inter font-medium tracking-tight">
             Bring Your Idea to Life in 3 Steps
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-400 text-md sm:text-lg">
             We take your idea and launch a clickable <br />
             prototype in 24–72 hours.
           </p>
         </div>
         <div>
-          <button className="bg-[#EB6505] px-4 py-2 rounded-3xl text-white font-medium">
+          <button
+            onClick={() => navigate("/demorequest")}
+            className="bg-[#EB6505] px-4 py-2 rounded-3xl text-white font-medium"
+          >
             Start Your Project Today
           </button>
         </div>

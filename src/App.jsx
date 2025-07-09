@@ -15,6 +15,7 @@ import DemoSubmitSuccess from "./pages/DemoSubmitSuccess";
 import Payment from "./pages/Payment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancelled from "./pages/PaymentCancelled";
+import ContactSupport from "./pages/ContactSupoort";
 function App() {
   const [count, setCount] = useState(0);
 
@@ -29,7 +30,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/success" element={<PaymentSuccess />} />
           <Route path="/cancel" element={<PaymentCancelled />} />
-
+          <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/demorequest" element={<DemoRequestForm />} />
           <Route path="/dashboard" element={<DashBoard />} />
           <Route path="/payment" element={<Payment />} />

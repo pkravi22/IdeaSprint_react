@@ -6,23 +6,20 @@ function HowItWorks() {
   return (
     <main>
       <div className="bg-white md:h-screen flex flex-col-reverse md:flex-row-reverse gap-4 items-center justify-center px-4 sm:px-8 py-4">
-        {/* Left Content */}
         <div className="flex-1 flex flex-col h-full px-4 md:px-16 py-8">
-          {/* Heading */}
           <div>
             <h1 className="text-3xl text-[#2F2F2F] font-inter font-medium tracking-tight">
               How It works
             </h1>
-            <p className="text-[#585858] text-sm font-normal tracking-tight">
-              Lorem ipsum dolor sit amet consectetur.
+            <p className="text-[#585858] text-[18px] font-normal tracking-tight">
+              Get your demo in three simple steps
             </p>
           </div>
 
-          {/* Steps */}
           <div className="flex flex-col gap-6 py-8">
             <div className="px-0">
               <p className="text-xl font-medium">1.Submit Your Idea</p>
-              <p className="text-[#585858]  ">
+              <p className="text-[#585858]  text-[16px] ">
                 Fill out our comprehensive form with your startup concept,
                 target audience, core features, and design preferences.
               </p>

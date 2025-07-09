@@ -6,42 +6,89 @@ const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const [status, setStatus] = useState("Verifying...");
-const token = localStorage.getItem("token");
-useEffect(() => {
-  const verifyPayment = async () => {
-    try {
-      const res = await axios.get(
-        `https://ideasprint-backend.onrender.com/api/transactions/confirm?session_id=${sessionId}`,
+  const [receiptUrl, setReceiptUrl] = useState(null);
+  const token = localStorage.getItem("token");
 
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log("payment res", res);
-      if (res.data.paymentStatus === "success") {
-        setStatus("Payment successful! Thank you.");
-      } else {
-        setStatus("Payment verification failed.");
+  useEffect(() => {
+    const verifyPayment = async () => {
+      try {
+        const res = await axios.get(
+          `https://ideasprint-backend.onrender.com/api/transactions/confirm?session_id=${sessionId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("Payment Response:", res.data);
+
+        if (res.data.success) {
+          setStatus("✅ Payment successful! Thank you.");
+          setReceiptUrl(res.data.receiptUrl);
+        } else {
+          setStatus("❌ Payment verification failed.");
+        }
+      } catch (error) {
+        setStatus("⚠️ Error verifying payment.");
+        console.error(error);
       }
-    } catch (error) {
-      setStatus("Error verifying payment.");
-      console.error(error);
+    };
+
+    if (sessionId) {
+      verifyPayment();
+    }
+  }, [sessionId, token]);
+
+  const handleCopy = () => {
+    if (receiptUrl) {
+      navigator.clipboard.writeText(receiptUrl);
+      alert("✅ Receipt link copied to clipboard!");
     }
   };
 
-  if (sessionId) {
-    verifyPayment();
-  }
-}, [sessionId]);
+  const handleDownloadHelp = () => {
+    window.open(receiptUrl, "_blank");
+    alert(
+      "📝 In the new tab, press Ctrl+P (or Cmd+P on Mac), then choose 'Save as PDF' to download."
+    );
+  };
 
   return (
-    <div
-      className="flex justify-center items-center min-h-screen bg-green-50 
-     "
-    >
-      <div className="shadow-md p-8 rounded-md">
-        {" "}
-        <h2 className="text-xl font-bold text-green-700">
-          Payment successfully completed
-        </h2>
+    <div className="flex justify-center items-center min-h-screen bg-green-50 px-4">
+      <div className="bg-white p-8 shadow-lg rounded-md max-w-md w-full text-center">
+        <h2 className="text-xl font-bold text-green-700 mb-4">{status}</h2>
+
+        {receiptUrl && (
+          <>
+            <p className="text-gray-600 mb-4">
+              Your payment receipt is ready. You can view or download it below.
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => window.open(receiptUrl, "_blank")}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+              >
+                View Receipt
+              </button>
+
+              <button
+                onClick={handleDownloadHelp}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
+              >
+                Download as PDF
+              </button>
+
+              <button
+                onClick={handleCopy}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded"
+              >
+                Copy Receipt Link
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ const PaymentSuccess = () => {
   const sessionId = searchParams.get("session_id");
   const [status, setStatus] = useState("Verifying...");
   const [receiptUrl, setReceiptUrl] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -20,8 +21,6 @@ const PaymentSuccess = () => {
             },
           }
         );
-
-        console.log("Payment Response:", res.data);
 
         if (res.data.success) {
           setStatus("✅ Payment successful! Thank you.");
@@ -48,10 +47,10 @@ const PaymentSuccess = () => {
   };
 
   const handleDownloadHelp = () => {
-    window.open(receiptUrl, "_blank");
-    alert(
-      "📝 In the new tab, press Ctrl+P (or Cmd+P on Mac), then choose 'Save as PDF' to download."
-    );
+    setShowHelp(true); // show instructions
+    setTimeout(() => {
+      window.open(receiptUrl, "_blank"); // open receipt
+    }, 1000); // delay slightly for UX clarity
   };
 
   return (
@@ -88,6 +87,17 @@ const PaymentSuccess = () => {
               </button>
             </div>
           </>
+        )}
+
+        {/* Simple Help Modal */}
+        {showHelp && (
+          <div className="mt-6 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative">
+            <strong className="font-bold">Note:</strong>
+            <span className="block sm:inline ml-1">
+              After the receipt opens, press <b>Ctrl + P</b> (or <b>Cmd + P</b>{" "}
+              on Mac), then choose <b>"Save as PDF"</b> to download it.
+            </span>
+          </div>
         )}
       </div>
     </div>

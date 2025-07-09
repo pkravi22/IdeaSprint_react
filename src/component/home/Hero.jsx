@@ -23,7 +23,6 @@ function Hero() {
             development team ready to bring your vision to life.
           </p>
 
-          {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
             <button
               onClick={() => navigate("/demorequest")}
@@ -36,7 +35,6 @@ function Hero() {
             </button>
           </div>
 
-          {/* Features */}
           <div className="flex flex-col text-white gap-2 pt-12">
             <div className="flex items-center gap-2">
               <img src={tick} alt="check" className="w-4 h-3" />

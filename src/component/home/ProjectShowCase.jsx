@@ -2,16 +2,11 @@ import React, { useRef } from "react";
 
 const videos = [
   {
-    title: "Limpiar Complete Project",
-    url: "https://youtu.be/C2CbOxRFtjQ?si=FcpE_VsTFhVIM78M",
-  },
-
-  {
     title: "Limpiar Money Management",
     url: "https://www.youtube.com/embed/6H8P3u2s1bw",
   },
   {
-    title: "Limpiar CLeaner Module",
+    title: "Limpiar CLeaner ",
     url: "https://www.youtube.com/embed/zOirJz1GsrU",
   },
 ];

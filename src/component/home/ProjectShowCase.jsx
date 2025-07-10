@@ -1,40 +1,20 @@
-import React, { useRef } from "react";
-
-const videos = [
-  {
-    title: "Limpiar Money Management",
-    url: "https://www.youtube.com/embed/6H8P3u2s1bw",
-  },
-  {
-    title: "Limpiar CLeaner ",
-    url: "https://www.youtube.com/embed/zOirJz1GsrU",
-  },
-];
+import React from "react";
 
 const ProjectsShowcase = () => {
-  const videoRefs = useRef([]);
-
-  const handleMouseEnter = (index) => {
-    const iframe = videoRefs.current[index];
-    if (iframe) {
-      const src = iframe.getAttribute("data-src");
-      iframe.src = `${src}?autoplay=1&mute=1&controls=0`;
-    }
-  };
-
-  const handleMouseLeave = (index) => {
-    const iframe = videoRefs.current[index];
-    if (iframe) {
-      iframe.src = ""; // Reset iframe
-      iframe.src = iframe.getAttribute("data-src"); // Restore original
-    }
-  };
+  const driveVideos = [
+    "https://drive.google.com/file/d/1WFAzsHpJnExPo5cr5QaMIqCayOUirrA2/preview",
+    "https://drive.google.com/file/d/1JJrlr6qd_PQwCL2XTVZtzByoUACKq_4B/preview",
+    "https://drive.google.com/file/d/18FPkLkixKiEOpJPUGVr6OaPCdlGPoSPw/preview",
+    "https://drive.google.com/file/d/1Ljhn4mxEpy6Xp_0_IIJvyaooxpESCoxN/preview",
+  ];
 
   return (
-    <main className="flex flex-col gap-10 py-20 justify-center items-center text-center px-4">
-      {/* Section Heading */}
+    <main
+      id="projects"
+      className="flex flex-col gap-10 py-10 justify-center items-center text-center px-4"
+    >
       <div className="flex flex-col gap-4">
-        <h1 className="text-3xl text-[#2F2F2F] font-inter font-medium tracking-tight">
+        <h1 className="text-3xl text-[#2F2F2F] font-medium tracking-tight">
           Projects We’ve Worked On
         </h1>
         <p className="text-gray-400 text-md sm:text-lg">
@@ -43,29 +23,25 @@ const ProjectsShowcase = () => {
         </p>
       </div>
 
-      {/* Videos Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-6xl">
-        {videos.map((video, index) => (
-          <div
-            key={index}
-            className="relative shadow-lg rounded-xl overflow-hidden border border-gray-200 bg-white"
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={() => handleMouseLeave(index)}
-          >
-            <iframe
-              ref={(el) => (videoRefs.current[index] = el)}
-              data-src={video.url}
-              src={video.url}
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              title={video.title}
-              className="w-full h-56 sm:h-64 md:h-72 lg:h-80 transition-all duration-300 ease-in-out"
-            />
-            <div className="absolute bottom-0 w-full bg-black bg-opacity-40 text-white py-2 px-4 text-left text-sm font-medium">
-              {video.title}
+      <div className="w-full overflow-x-auto relative">
+        <div className="flex gap-6 px-4 sm:px-10 md:px-20 py-6 w-max">
+          {driveVideos.map((url, index) => (
+            <div
+              key={index}
+              className="min-w-[280px] sm:min-w-[420px] md:min-w-[450px]  bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:scale-105 transition-transform duration-300"
+            >
+              <iframe
+                src={url}
+                width="100%"
+                height="320"
+                allow="autoplay"
+                allowFullScreen
+                className="w-full"
+                title={`drive-video-${index}`}
+              ></iframe>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </main>
   );

@@ -8,7 +8,7 @@ const footerLinks = [
     title: "Product",
     links: [
       { name: "Pricing", hash: "pricing" },
-      { name: "Example" },
+      { name: "Example", hash: "projects" },
       { name: "Api" },
       { name: "Documentation" },
     ],

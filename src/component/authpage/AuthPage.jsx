@@ -6,6 +6,7 @@ import CryptoJS from "crypto-js";
 const AuthPage = () => {
   const [mode, setMode] = useState("signin");
   const [loading, setLoading] = useState(false);
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const [signUpDetails, setSignUpDetails] = useState({
     username: "",
@@ -17,6 +18,12 @@ const AuthPage = () => {
     identifier: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (token) {
+      navigate("/");
+    }
+  }, []);
   // ------------------------
   //
   //encrypt the payload before sending it to the server

@@ -5,7 +5,7 @@ const ProjectsShowcase = () => {
     "https://drive.google.com/file/d/1WFAzsHpJnExPo5cr5QaMIqCayOUirrA2/preview",
     "https://drive.google.com/file/d/1JJrlr6qd_PQwCL2XTVZtzByoUACKq_4B/preview",
     "https://drive.google.com/file/d/18FPkLkixKiEOpJPUGVr6OaPCdlGPoSPw/preview",
-    "https://drive.google.com/file/d/1Ljhn4mxEpy6Xp_0_IIJvyaooxpESCoxN/preview",
+    "https://drive.google.com/file/d/1wqW4uCVt28_8uthCHJDP7FXoJtRUjQ5A/preview",
   ];
 
   return (
@@ -28,7 +28,7 @@ const ProjectsShowcase = () => {
           {driveVideos.map((url, index) => (
             <div
               key={index}
-              className="min-w-[280px] sm:min-w-[420px] md:min-w-[450px]  bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:scale-105 transition-transform duration-300"
+              className="min-w-[280px]  sm:min-w-[420px] md:min-w-[450px]  bg-white rounded-xl shadow-lg  overflow-hidden border border-gray-200 hover:scale-105 transition-transform duration-300"
             >
               <iframe
                 src={url}
@@ -36,7 +36,7 @@ const ProjectsShowcase = () => {
                 height="320"
                 allow="autoplay"
                 allowFullScreen
-                className="w-full"
+                className="w-full p-2"
                 title={`drive-video-${index}`}
               ></iframe>
             </div>

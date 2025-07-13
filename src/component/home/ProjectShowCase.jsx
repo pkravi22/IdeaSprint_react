@@ -3,9 +3,9 @@ import React from "react";
 const ProjectsShowcase = () => {
   const driveVideos = [
     "https://drive.google.com/file/d/1WFAzsHpJnExPo5cr5QaMIqCayOUirrA2/preview",
-    "https://drive.google.com/file/d/1JJrlr6qd_PQwCL2XTVZtzByoUACKq_4B/preview",
-    "https://drive.google.com/file/d/18FPkLkixKiEOpJPUGVr6OaPCdlGPoSPw/preview",
-    "https://drive.google.com/file/d/1wqW4uCVt28_8uthCHJDP7FXoJtRUjQ5A/preview",
+    "https://drive.google.com/file/d/1JUlJ3FzB_3xW1ycim3qY8enrwiPxruzp/preview",
+    "https://drive.google.com/file/d/13ledn-nHz6anPHU1mwZ-l-5XddqsGcnm/preview",
+    "https://drive.google.com/file/d/1q3SHRyqCh_EEahcwjP6vG5FaBTfQJJhT/preview",
   ];
 
   return (

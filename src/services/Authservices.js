@@ -10,7 +10,8 @@ export const signup = async (data) => {
     });
     return { success: true, user: res.data };
   } catch (error) {
-    return { success: false, error: error.response.data };
+    console.log("Signup error", error.response.data.error);
+    return { success: false, error: error.response.data.error };
   }
 };
 export const signin = async (credentials) => {

@@ -5,7 +5,7 @@ import { hero } from "../../constants/ImagePath.js"; // Importing hero image fro
 function HowItWorks() {
   return (
     <main>
-      <div className="bg-white md:h-screen flex flex-col-reverse md:flex-row-reverse gap-4 items-center justify-center px-4 sm:px-8 py-4">
+      <div className="bg-white md:max-h-[600px] flex flex-col-reverse md:flex-row-reverse gap-4 items-center justify-center px-4 sm:px-8 py-4">
         <div className="flex-1 flex flex-col h-full px-4 md:px-16 py-8">
           <div>
             <h1 className="text-3xl text-[#2F2F2F] font-inter font-medium tracking-tight">

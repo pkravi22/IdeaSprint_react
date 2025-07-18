@@ -6,9 +6,9 @@ function Hero() {
   const navigate = useNavigate();
   return (
     <main>
-      <div className="bg-[#EB6505] md:min-h-screen flex flex-col md:flex-row gap-8 px-8 py-12">
+      <div className="bg-[#EB6505] lg:min-h-screen flex flex-col md:flex-row gap-8 px-8 py-12">
         <div className="flex-1 flex flex-col h-full justify-center">
-          <h1 className="text-4xl md:text-7xl font-inter font-medium tracking-tighter text-white mb-4">
+          <h1 className="text-4xl lg:text-7xl font-inter font-medium tracking-tighter text-white mb-4">
             Get Your <br />
             Startup demo <br />
             Built in{" "}
@@ -23,7 +23,7 @@ function Hero() {
             development team ready to bring your vision to life.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
             <button
               onClick={() => navigate("/demorequest")}
               className=" cursor-pointer px-4 md:px-12 py-2 bg-white text-[#EB6505] rounded-full"

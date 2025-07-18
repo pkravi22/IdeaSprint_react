@@ -61,14 +61,14 @@ const handleLogout = () => {
 };
 
 return (
-  <header className="flex px-2 sm:px-8 text-white w-full bg-[#EB6505] font-bold items-center justify-between md:px-10 py-2 relative">
+  <header className="flex px-2 md:px-4 text-white w-full bg-[#EB6505] font-bold items-center justify-between lg:px-10 py-2 relative">
     {/* Logo */}
     <div className="text-2xl">
       <Link to="/">IdeaSprint.</Link>
     </div>
 
     {/* Desktop Nav */}
-    <nav className="hidden md:flex space-x-8 text-white font-medium">
+    <nav className="hidden md:flex md:space-x-4 lg:space-x-8 text-white font-medium">
       <button
         onClick={() => handleSectionClick("working")}
         className="cursor-pointer"

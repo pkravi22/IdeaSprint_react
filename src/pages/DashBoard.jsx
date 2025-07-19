@@ -44,6 +44,9 @@ const Dashboard = () => {
   const totalPending = uniqueDemoRequests?.filter(
     (request) => request.Demo_status === "pending"
   )?.length;
+  const totalCompleted = uniqueDemoRequests?.filter(
+    (request) => request.Demo_status === "completed"
+  )?.length;
 
   // Stats data
   const statsData = [
@@ -61,7 +64,7 @@ const Dashboard = () => {
     },
     {
       title: "Completed",
-      value: "0",
+      value: totalCompleted,
       icon: chart,
       bgColor: "bg-green-600",
     },

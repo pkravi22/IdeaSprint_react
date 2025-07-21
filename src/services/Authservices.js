@@ -1,4 +1,4 @@
-const BASE_URL = "https://ideasprint-backend.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 import axios from "axios";
 export const signup = async (data) => {
   console.log(data);
@@ -44,14 +44,14 @@ const payment = async (data) => {
     return { success: false, error: error.response.data };
   }
 };
- export const getUser = async (token) => {
-   try {
-     const res = await axios.get(`${BASE_URL}/users/me?populate=demo_schemas`, {
-       headers: { Authorization: `Bearer ${token}` },
-     });
-     return { success: true, user: res.data };
-   } catch (error) {
-     console.error("Error fetching user:", error);
-     return { success: false, error: error.response.data };
-   }
- };
+export const getUser = async (token) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/users/me?populate=demo_schemas`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return { success: true, user: res.data };
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return { success: false, error: error.response.data };
+  }
+};

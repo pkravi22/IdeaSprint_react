@@ -12,7 +12,9 @@ import ProjectsShowcase from "../component/home/ProjectShowCase";
 
 const Home = () => {
   const token = localStorage.getItem("token");
+  console.log("Base URL", import.meta.env.VITE_BASE_URL);
 
+  
   const fetchUser = async () => {
     try {
       const response = await getUser(token);

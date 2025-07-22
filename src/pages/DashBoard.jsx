@@ -22,20 +22,16 @@ const Dashboard = () => {
   const token = localStorage.getItem("token");
   const [viewall, setViewAll] = useState(false);
   const [requestToDisplay, setRequestToDisplay] = useState([]);
-  useEffect(() => {
-    // Redirect to login if no token is present
-    if (!token) {
-      navigate("/authpage");
-    }
-  }, [token, navigate]);
-
-  // Safely calculate unique demo requests
   const uniqueDemoRequests = useMemo(() => {
     if (!Array.isArray(user?.demo_schemas)) return [];
 
     const requestMap = new Map();
 
     user.demo_schemas.forEach((item) => {
+      // 🚫 Skip requests with pending payment
+      if (item.Payment_status === "pending" || item.Payment_status === null)
+        return;
+
       const id = item.documentId;
       const existing = requestMap.get(id);
 
@@ -54,6 +50,7 @@ const Dashboard = () => {
 
     return Array.from(requestMap.values());
   }, [user]);
+  console.log("Unique Demo Requests:", uniqueDemoRequests);
 
   //find requests according to dates
   const sortedDemoRequests = useMemo(() => {

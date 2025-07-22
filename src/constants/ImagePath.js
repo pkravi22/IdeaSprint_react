@@ -8,8 +8,11 @@ import colon from "../assets/colon.png";
 import rocket from "../assets/rocket.png";
 import userIcon from "../assets/user.png";
 import tick from "../assets/Vector.png";
-import profile2 from "../assets/pic1.png";
-import profile3 from "../assets/pic2.png";
+import profile1 from "../assets/pic1.png";
+
+import profile2 from "../assets/pic2.png";
+import profile3 from "../assets/pic3.png";
+
 import rocketColored from "../assets/image2.png";
 import bulbColored from "../assets/image1.png";
 import dashboard from "../assets/dashboard.png";
@@ -26,6 +29,7 @@ export {
   rocket,
   userIcon,
   tick,
+  profile1,
   profile2,
   profile3,
   rocketColored,

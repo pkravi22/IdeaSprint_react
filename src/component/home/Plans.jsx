@@ -1,9 +1,11 @@
 import React from "react";
 import { tick } from "../../constants/ImagePath";
-
+import { useNavigate } from "react-router-dom";
 const plans = [
   {
+    id: "basic",
     title: "Basic",
+
     price: "$150",
     duration: "/month",
     badge: null,
@@ -16,6 +18,7 @@ const plans = [
     ],
   },
   {
+    id: "standard",
     title: "Standard",
     price: "$300",
     duration: "/month",
@@ -29,6 +32,7 @@ const plans = [
     ],
   },
   {
+    id: "premium",
     title: "Premium",
     price: "$500",
     duration: "/month",
@@ -42,6 +46,7 @@ const plans = [
     ],
   },
   {
+    id: "investor",
     title: "Investor Pack",
     price: "$750",
     duration: "/month",
@@ -57,10 +62,16 @@ const plans = [
 ];
 
 function Plans() {
+  const navigate = useNavigate();
+
+  const handleChoosePlan = (plan) => {
+    localStorage.setItem("selectedPlan", JSON.stringify(plan));
+    navigate("/demorequest");
+  };
+
   return (
     <main className="bg-gray-100">
       <div className="py-8 px-4 sm:px-8 flex flex-col justify-center items-center gap-8">
-        {/* Heading */}
         <div className="text-center">
           <h1 className="text-4xl tracking-tighter font-inter font-medium text-[#2F2F2F] mb-4">
             Choose Your Plan
@@ -71,11 +82,11 @@ function Plans() {
           </p>
         </div>
 
-        {/* Plan Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 justify-center bg-white p-6 rounded-xl items-center gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 justify-center bg-white p-2 sm:p-6 rounded-xl items-center gap-6">
           {plans.map((plan, index) => (
             <div
               key={index}
+              onClick={() => handleChoosePlan(plan)}
               className={`w-56 bg-white ${
                 plan.title === "Premium" ? "h-80" : "h-72"
               } rounded-xl hover:bg-[#EB6505] active:bg-[#EB6505] flex flex-col gap-4 text-[#848199] hover:text-white active:text-white p-2`}
@@ -112,7 +123,7 @@ function Plans() {
                 ))}
               </div>
               <div className="flex justify-center mt-auto">
-                <button className="px-6 py-1 rounded-3xl bg-orange-200 text-[#EB6505] hover:bg-white">
+                <button className="px-6 cursor-pointer py-1 rounded-3xl bg-orange-200 text-[#EB6505] hover:bg-white">
                   Choose Plan
                 </button>
               </div>

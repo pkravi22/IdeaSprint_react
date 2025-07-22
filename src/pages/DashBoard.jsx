@@ -40,7 +40,13 @@ const Dashboard = () => {
     }, []);
   }, [user]);
 
-  // Count pending requests
+  //find requests according to dates
+  const sortedDemoRequests = useMemo(() => {
+    return uniqueDemoRequests.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+  }, [uniqueDemoRequests]);
+
   const totalPending = uniqueDemoRequests?.filter(
     (request) => request.Demo_status === "pending"
   )?.length;
@@ -48,7 +54,6 @@ const Dashboard = () => {
     (request) => request.Demo_status === "completed"
   )?.length;
 
-  // Stats data
   const statsData = [
     {
       title: "Today's Money",
@@ -83,7 +88,6 @@ const Dashboard = () => {
     { icon: contact, text: "Contact Support", url: "/contact-support" },
   ];
 
-  // Format date
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
@@ -94,14 +98,13 @@ const Dashboard = () => {
     navigate(url);
   };
 
-  // Update requests to display based on "view all" toggle
   useEffect(() => {
     if (viewall) {
-      setRequestToDisplay(uniqueDemoRequests);
+      setRequestToDisplay(sortedDemoRequests);
     } else {
-      setRequestToDisplay(uniqueDemoRequests?.slice(0, 3));
+      setRequestToDisplay(sortedDemoRequests?.slice(0, 3));
     }
-  }, [viewall, uniqueDemoRequests]);
+  }, [viewall, sortedDemoRequests]);
 
   const handleModalopen = (request) => {
     console.log(request);
@@ -180,7 +183,7 @@ const Dashboard = () => {
           <div className="flex-1 bg-white rounded-lg shadow-sm p-4">
             <div className="flex justify-between mb-4">
               <h2 className="font-medium">Recent Projects</h2>
-              {uniqueDemoRequests?.length > 0 && (
+              {sortedDemoRequests?.length > 0 && (
                 <button
                   className="text-[#EB6505] text-sm hover:text-orange-700 transition text-left"
                   onClick={() => setViewAll(!viewall)}

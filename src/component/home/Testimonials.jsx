@@ -1,5 +1,10 @@
 import React from "react";
-import { profile2, profile3, colon } from "../../constants/ImagePath.js"; // Importing images from constants
+import {
+  profile2,
+  profile3,
+  profile1,
+  colon,
+} from "../../constants/ImagePath.js"; // Importing images from constants
 const testimonials = [
   {
     id: 1,
@@ -7,7 +12,7 @@ const testimonials = [
       "IdeaSprint delivered our MVP demo in 48 hours. The quality was outstanding and helped us secure our seed round of $500K. Highly recommended!",
     name: "Sarah Chen",
     title: "Founder, EcoTrack",
-    image: profile2,
+    image: profile1,
   },
   {
     id: 2,
@@ -15,7 +20,7 @@ const testimonials = [
       "The demo was so polished that investors thought we had a working product. It perfectly captured our vision and saved us months of development time.",
     name: "Marcus Rodriguez",
     title: "CEO, FinanceFlow",
-    image: profile3,
+    image: profile2,
   },
   {
     id: 3,
@@ -23,7 +28,7 @@ const testimonials = [
       "Amazing attention to detail and fast turnaround. The demo helped us validate our idea with early users before committing to full development.",
     name: "Amanda Foster",
     title: "CEO, HealthTech",
-    image: profile2,
+    image: profile3,
   },
 ];
 

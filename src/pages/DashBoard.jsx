@@ -17,7 +17,7 @@ const Dashboard = () => {
   const [modalDetails, setModalDetails] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedButton, setSelectedButton] = useState("New Demo Request");
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   console.log(user);
   const token = localStorage.getItem("token");
   const [viewall, setViewAll] = useState(false);
@@ -170,7 +170,7 @@ const Dashboard = () => {
                 </p>
                 <p>
                   <strong>Status:</strong>{" "}
-                  {modalDetails.Demo_status || "pending"}
+                  {modalDetails.Demo_status || "In Progress"}
                 </p>
                 <p>
                   <strong>Short Description:</strong>{" "}
@@ -213,7 +213,6 @@ const Dashboard = () => {
           </p>
         </section>
 
-        {/* Stats */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {statsData.map((stat, index) => (
             <StatCard
@@ -230,7 +229,7 @@ const Dashboard = () => {
           <div className="flex-1 bg-white rounded-lg shadow-sm p-4">
             <div className="flex justify-between mb-4">
               <h2 className="font-medium">Recent Projects</h2>
-              {sortedDemoRequests?.length > 0 && (
+              {!isLoading && sortedDemoRequests?.length > 0 && (
                 <button
                   className="text-[#EB6505] text-sm hover:text-orange-700 transition text-left"
                   onClick={() => setViewAll(!viewall)}
@@ -240,7 +239,19 @@ const Dashboard = () => {
               )}
             </div>
 
-            {Array.isArray(requestToDisplay) && requestToDisplay.length > 0 ? (
+            {isLoading ? (
+              <div className="flex flex-col gap-4 min-h-[200px] justify-center items-center">
+                <img
+                  src={rocket}
+                  alt="Loading"
+                  className="w-12 h-12 animate-bounce"
+                />
+                <p className="text-gray-400 text-sm">
+                  Fetching Demo Requests...
+                </p>
+              </div>
+            ) : Array.isArray(requestToDisplay) &&
+              requestToDisplay.length > 0 ? (
               <div className="space-y-4">
                 {requestToDisplay.map((request) => (
                   <div
@@ -259,14 +270,16 @@ const Dashboard = () => {
                       </div>
                       <span
                         className={`px-2 py-1 text-xs rounded-full ${
-                          request.Demo_status === "approved"
+                          request.Demo_status === "completed"
                             ? "bg-green-100 text-green-800"
-                            : request.Demo_status === "rejected"
+                            : request.Demo_status === "pending"
                             ? "bg-red-100 text-red-800"
                             : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {request.Demo_status || "pending"}
+                        {request.Demo_status === "pending"
+                          ? "In Progress"
+                          : request.Demo_status}
                       </span>
                     </div>
                     <p className="text-gray-600 mt-2 line-clamp-2">
@@ -291,7 +304,6 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Right Sidebar */}
           <div className="md:w-[35%] flex flex-col gap-6">
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="font-medium py-2">Quick Actions</h2>

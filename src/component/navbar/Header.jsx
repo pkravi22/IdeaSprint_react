@@ -12,30 +12,32 @@ function Header() {
   const token = localStorage.getItem("token");
 
   // Get user data and methods from context
-  const { user, login, logout } = useUser();
-const username = JSON.parse(localStorage.getItem("user"));
-console.log(username);
-useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get(
-        "https://ideasprint-backend.onrender.com/api/users/me?populate=demo_schemas",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      login(response.data);
-      console.log("User fetched:", response.data);
-    } catch (e) {
-      console.log("Error fetching user:", e);
-      logout();
-    }
-  };
+  const { user, login, logout, setIsLoading } = useUser();
+  const username = JSON.parse(localStorage.getItem("user"));
+  console.log(username);
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(
+          "https://ideasprint-backend.onrender.com/api/users/me?populate=demo_schemas",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setIsLoading(false);
+        login(response.data);
+        console.log("User fetched:", response.data);
+      } catch (e) {
+        console.log("Error fetching user:", e);
+        logout();
+      }
+    };
 
-  if (token) {
-    fetchUser();
-  }
-}, [token]);
+    if (token) {
+      fetchUser();
+    }
+  }, [token]);
 
 const handleSectionClick = (hash) => {
   if (location.pathname === "/") {

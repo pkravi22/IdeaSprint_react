@@ -32,12 +32,27 @@ const Dashboard = () => {
   // Safely calculate unique demo requests
   const uniqueDemoRequests = useMemo(() => {
     if (!Array.isArray(user?.demo_schemas)) return [];
-    return user.demo_schemas.reduce((acc, current) => {
-      if (!acc.some((item) => item.documentId === current.documentId)) {
-        acc.push(current);
+
+    const requestMap = new Map();
+
+    user.demo_schemas.forEach((item) => {
+      const id = item.documentId;
+      const existing = requestMap.get(id);
+
+      if (
+        item.Payment_status === "paid" &&
+        item.receipt_url &&
+        (!existing ||
+          existing.Payment_status !== "paid" ||
+          !existing.receipt_url)
+      ) {
+        requestMap.set(id, item);
+      } else if (!existing) {
+        requestMap.set(id, item);
       }
-      return acc;
-    }, []);
+    });
+
+    return Array.from(requestMap.values());
   }, [user]);
 
   //find requests according to dates
@@ -140,8 +155,18 @@ const Dashboard = () => {
                 <p>
                   <strong>Plan:</strong> {modalDetails.Plan}
                 </p>
-                <p>
-                  <strong>Paid amount:</strong> {modalDetails.TotalMoney}
+                <p
+                  className={`${
+                    modalDetails.Payment_status === "paid"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  <strong>Paid amount: </strong>
+                  {"$"}
+                  {modalDetails.Payment_status === "paid"
+                    ? modalDetails.TotalMoney
+                    : "Not Paid"}
                 </p>
                 <p>
                   <strong>Status:</strong>{" "}
@@ -164,12 +189,15 @@ const Dashboard = () => {
               >
                 Close
               </button>
-              <button
-                className="bg-[#EB6505] mt-4 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition"
-                onClick={() => handlePaymentView(modalDetails)}
-              >
-                View Payment Details
-              </button>
+              {modalDetails?.Payment_status === "paid" &&
+                modalDetails?.receipt_url && (
+                  <button
+                    className="bg-[#EB6505] mt-4 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition"
+                    onClick={() => handlePaymentView(modalDetails)}
+                  >
+                    View Payment Details
+                  </button>
+                )}
             </div>
           </div>
         </div>

@@ -112,6 +112,17 @@ const Dashboard = () => {
     setModalDetails(request);
   };
 
+  //   const handlePaymentView=(modalDetails)=>
+  // window.location.href=modalDetails?.receipt_url`;
+
+  const handlePaymentView = (modalDetails) => {
+    if (modalDetails?.receipt_url) {
+      window.open(modalDetails.receipt_url, "_blank");
+    } else {
+      alert("No payment details available for this request.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {modalOpen && (
@@ -146,12 +157,20 @@ const Dashboard = () => {
                 </p>
               </div>
             )}
-            <button
-              className="bg-[#EB6505] mt-4 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition"
-              onClick={() => setModalOpen(false)}
-            >
-              Close
-            </button>
+            <div className="flex justify-between ">
+              <button
+                className="bg-[#EB6505] mt-4 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition"
+                onClick={() => setModalOpen(false)}
+              >
+                Close
+              </button>
+              <button
+                className="bg-[#EB6505] mt-4 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition"
+                onClick={() => handlePaymentView(modalDetails)}
+              >
+                View Payment Details
+              </button>
+            </div>
           </div>
         </div>
       )}

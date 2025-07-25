@@ -282,6 +282,17 @@ const Dashboard = () => {
                     <p className="text-gray-600 mt-2 line-clamp-2">
                       {request.ShortDescription}
                     </p>
+                    {request.demo_url ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(request.Demo_url, "_blank");
+                        }}
+                        className="bg-orange-300 text-white rounded-2xl px-4 py-1 mt-2"
+                      >
+                        Check Your Website
+                      </button>
+                    ) : null}
                   </div>
                 ))}
               </div>

@@ -89,6 +89,13 @@ const DemoRequestForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   //const [plans,setPlans]=useState(null)
   //const [selectedPlan, setSelectedPlan] = useState(null);
+
+  const [plans, setPlans] = useState(() => {
+    const planData = localStorage.getItem("allPlans");
+    if (planData) {
+      return JSON.parse(planData);
+    }
+  });
   const [selectedPlan, setSelectedPlan] = useState(() => {
     const stored = localStorage.getItem("selectedPlan");
     if (stored) {
@@ -98,13 +105,7 @@ const DemoRequestForm = () => {
     return plans[0];
   });
   const { allPlans, setAllPlans } = useUser();
-  const[plans,setPlans]=useState(()=>{
-     const planData = localStorage.getItem("allPlans");
-  if (planData) {
-   return JSON.parse(planData);
-   
-  }
-  })
+  
   
  
 

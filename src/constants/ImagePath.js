@@ -3,7 +3,7 @@ import airplane from "../assets/airplane.png";
 import bulb from "../assets/bulb.png";
 import chart from "../assets/chart.png";
 import mind from "../assets/image 3.png";
-import hero from "../assets/hero.jpg";
+import hero from "../assets/hero.webp";
 import colon from "../assets/colon.png";
 import rocket from "../assets/rocket.png";
 import userIcon from "../assets/user.png";

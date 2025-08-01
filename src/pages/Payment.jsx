@@ -17,6 +17,7 @@ const Payment = () => {
     amount = 0,
     projectName = "",
     plan = "",
+    id = "",
     demoRequestId = "",
     customerEmail = "",
     customerName = "",
@@ -37,15 +38,14 @@ const Payment = () => {
         throw new Error("Authentication Token not found");
       }
 
-      const amountInSmallestUnit = Math.round(amount * 100);
+      // const amountInSmallestUnit = Math.round(amount * 100);
 
       const backendUrl = "https://ideasprint-backend.onrender.com";
 
       const response = await axios.post(
         `${backendUrl}/api/transactions/checkout`,
         {
-          amount: amount,
-          currency: "usd",
+          planId: id,
           receiptEmail: customerEmail,
           demoSchemaId: demoRequestId,
         },
@@ -110,9 +110,7 @@ const Payment = () => {
             </div>
             <div className="flex justify-between pt-2 border-t border-gray-200">
               <span className="text-gray-600 font-semibold">Total:</span>
-              <span className="text-xl font-bold text-[#EB6505]">
-                ${amount}
-              </span>
+              <span className="text-xl font-bold text-[#EB6505]">{amount}</span>
             </div>
           </div>
         </div>

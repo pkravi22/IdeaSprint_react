@@ -36,57 +36,58 @@ async function uploadImageToCloudinary(file) {
     throw new Error(`Failed to upload ${file.name}: ${err.message}`);
   }
 }
-const plans = [
-  {
-    id: "basic",
-    name: "Basic",
-    price: 150,
-    features: [
-      "3-5 Interactive Screens",
-      "Basic interaction",
-      "Mobile responsive",
-      "72-hour delivery",
-    ],
-  },
-  {
-    id: "standard",
-    name: "Standard",
-    price: 300,
-    features: [
-      "8-10 screens",
-      "Advanced interactions",
-      "Custom animations",
-      "48-hour delivery",
-    ],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: 500,
-    features: [
-      "15+ screens",
-      "Full user flow",
-      "Premium animations",
-      "24-hour delivery",
-    ],
-  },
-  {
-    id: "investor",
-    name: "Investor Pack",
-    price: 750,
-    features: [
-      "Everything in Premium",
-      "Pitch deck integration",
-      "Analytics Dashboard",
-      "Priority support",
-    ],
-  },
-];
+// const plans = [
+//   {
+//     id: "basic",
+//     name: "Basic",
+//     price: 150,
+//     features: [
+//       "3-5 Interactive Screens",
+//       "Basic interaction",
+//       "Mobile responsive",
+//       "72-hour delivery",
+//     ],
+//   },
+//   {
+//     id: "standard",
+//     name: "Standard",
+//     price: 300,
+//     features: [
+//       "8-10 screens",
+//       "Advanced interactions",
+//       "Custom animations",
+//       "48-hour delivery",
+//     ],
+//   },
+//   {
+//     id: "premium",
+//     name: "Premium",
+//     price: 500,
+//     features: [
+//       "15+ screens",
+//       "Full user flow",
+//       "Premium animations",
+//       "24-hour delivery",
+//     ],
+//   },
+//   {
+//     id: "investor",
+//     name: "Investor Pack",
+//     price: 750,
+//     features: [
+//       "Everything in Premium",
+//       "Pitch deck integration",
+//       "Analytics Dashboard",
+//       "Priority support",
+//     ],
+//   },
+// ];
 
 const DemoRequestForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  //const [plans,setPlans]=useState(null)
   //const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(() => {
     const stored = localStorage.getItem("selectedPlan");
@@ -96,6 +97,19 @@ const DemoRequestForm = () => {
 
     return plans[0];
   });
+  const { allPlans, setAllPlans } = useUser();
+  const[plans,setPlans]=useState(()=>{
+     const planData = localStorage.getItem("allPlans");
+  if (planData) {
+   return JSON.parse(planData);
+   
+  }
+  })
+  
+ 
+
+
+  
   const [files, setFiles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [coreFeatures, setCoreFeatures] = useState([""]);
@@ -103,6 +117,7 @@ const DemoRequestForm = () => {
   const [fileUploadProgress, setFileUploadProgress] = useState({});
   const [fileUploadErrors, setFileUploadErrors] = useState({});
   const [plan, setPlan] = useState(null);
+  
   const { user } = useUser();
   const scrollToTop = () => {
     window.scrollTo({
@@ -126,7 +141,7 @@ const DemoRequestForm = () => {
     }
   }, [navigate]);
   console.log("selectedPlan:", selectedPlan);
-
+console.log("all plans ",plans)
   //const { username, email } = user;
   const [formData, setFormData] = useState({
     Fullname: username,
@@ -355,6 +370,7 @@ const DemoRequestForm = () => {
       }
 
       const data = {
+        
         Fullname: formData.Fullname,
         Email: formData.Email,
         ProjectName: formData.ProjectName,
@@ -365,9 +381,11 @@ const DemoRequestForm = () => {
         ShortDescriptionOfIdea: formData.ShortDescriptionOfIdea,
         coreFeatures: coreFeatures.filter((f) => f.trim() !== ""),
         TotalMoney: String(plan.price),
-        Plan: plan.name,
+        Plan: plan.title,
+        Id:plan.id,
         files: fileUrls.length > 0 ? fileUrls[0] : "",
       };
+      console.log("Hey",data)
 
       const res = await axios.post(
         "https://ideasprint-backend.onrender.com/api/demo-schemas",
@@ -382,9 +400,10 @@ const DemoRequestForm = () => {
 
       navigate("/payment", {
         state: {
+          id:plan.id,
           amount: plan.price,
           projectName: formData.ProjectName,
-          plan: plan.name,
+          plan: plan.title,
           demoRequestId: res.data.data.id,
           customerEmail: formData.Email,
           customerName: formData.Fullname,
@@ -416,7 +435,10 @@ const DemoRequestForm = () => {
       setIsSubmitting(false);
     }
   };
+
+  console.log()
   console.log("Selected plan:", selectedPlan);
+  
   const selectedPlanObject = plans.find((p) => p.id === selectedPlan.id);
   console.log(selectedPlanObject);
   const totalPrice = selectedPlanObject ? selectedPlanObject.price : 0;
@@ -801,7 +823,7 @@ const DemoRequestForm = () => {
                       {plan.name}
                     </h3>
                     <p className="text-lg sm:text-xl font-medium text-[#2F2F2F]">
-                      ${plan.price}
+                      {plan.price}
                     </p>
                   </div>
                   <div className="mt-3 flex flex-col gap-2">
@@ -837,7 +859,7 @@ const DemoRequestForm = () => {
             <div className="flex flex-col gap-2">
               <div className="p-4 border border-gray-200 rounded-md flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
-                  <p className="font-medium text-lg">Total: ${totalPrice}</p>
+                  <p className="font-medium text-lg">Total: {totalPrice}</p>
                   <p className="text-gray-500 text-sm sm:text-base mt-1">
                     You'll be redirected to secure payment after submission
                   </p>

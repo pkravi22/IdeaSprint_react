@@ -1,73 +1,142 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { tick } from "../../constants/ImagePath";
 import { useNavigate } from "react-router-dom";
-const plans = [
-  {
-    id: "basic",
-    title: "Basic",
-
-    price: "$150",
-    duration: "/month",
-    badge: null,
-    category: "Perfect for early Validation",
-    features: [
-      "3-5 core screen",
-      "Basic interactions",
-      "Mobile responsive",
-      "72-hour delivery",
-    ],
-  },
-  {
-    id: "standard",
-    title: "Standard",
-    price: "$300",
-    duration: "/month",
-    badge: null,
-    category: "Great For user Testing",
-    features: [
-      "8-10 screens",
-      "Advanced interactions",
-      "Custom animations",
-      "48-hour delivery",
-    ],
-  },
-  {
-    id: "premium",
-    title: "Premium",
-    price: "$500",
-    duration: "/month",
-    badge: "Most Popular",
-    category: "Ideal for pitching",
-    features: [
-      "15+ screens",
-      "Full user flow",
-      "Premium animations",
-      "24-hour delivery",
-    ],
-  },
-  {
-    id: "investor",
-    title: "Investor Pack",
-    price: "$750",
-    duration: "/month",
-    badge: null,
-    category: "Perfect for fundraising",
-    features: [
-      "Everything in Premium",
-      "Pitch deck integration",
-      "Analytics dashboard",
-      "Priority support",
-    ],
-  },
-];
+import axios from "axios";
+import { useUser } from "../../context/userContext";
 
 function Plans() {
   const navigate = useNavigate();
+  const [plans, setPlans] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { allPlans, setAllPlans } = useUser();
+  const planInLocalStorage = localStorage.getItem("allPlans");
+  useEffect(() => {
+    const planInLocalStorage = localStorage.getItem("allPlans");
+
+    if (planInLocalStorage) {
+      const parsedPlans = JSON.parse(planInLocalStorage);
+      setPlans(parsedPlans);
+      setAllPlans(parsedPlans);
+      setIsLoading(false);
+    } else {
+      const fetchPlans = async () => {
+        try {
+          setIsLoading(true);
+          const response = await axios.get(
+            "https://ideasprint-backend.onrender.com/api/plans"
+          );
+
+          const transformedPlans = response.data.data.map((plan) => ({
+            id: plan.id,
+            documentId: plan.documentId,
+            title: plan.name,
+            price: `$${plan.price}`,
+            duration: "/month",
+            badge: plan.name === "Premium" ? "Most Popular" : null,
+            category: getCategory(plan.name),
+            features: getFeatures(plan.name),
+            backendData: {
+              createdAt: plan.createdAt,
+              currency: plan.currency,
+              publishedAt: plan.publishedAt,
+              updatedAt: plan.updatedAt,
+            },
+          }));
+
+          setPlans(transformedPlans);
+          setAllPlans(transformedPlans);
+          localStorage.setItem("allPlans", JSON.stringify(transformedPlans));
+        } catch (err) {
+          console.error("Error fetching plans:", err);
+          setError("Failed to load plans. Please try again later.");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchPlans();
+    }
+  }, []);
+
+  // Helper functions to map plan names to UI details
+  const getCategory = (planName) => {
+    switch (planName) {
+      case "Basic":
+        return "Perfect for early Validation";
+      case "Standard":
+        return "Great For user Testing";
+      case "Premium":
+        return "Ideal for pitching";
+      case "Investor Pack":
+        return "Perfect for fundraising";
+      default:
+        return "";
+    }
+  };
+
+  const getFeatures = (planName) => {
+    switch (planName) {
+      case "Basic":
+        return [
+          "3-5 core screen",
+          "Basic interactions",
+          "Mobile responsive",
+          "72-hour delivery",
+        ];
+      case "Standard":
+        return [
+          "8-10 screens",
+          "Advanced interactions",
+          "Custom animations",
+          "48-hour delivery",
+        ];
+      case "Premium":
+        return [
+          "15+ screens",
+          "Full user flow",
+          "Premium animations",
+          "24-hour delivery",
+        ];
+      case "Investor Pack":
+        return [
+          "Everything in Premium",
+          "Pitch deck integration",
+          "Analytics dashboard",
+          "Priority support",
+        ];
+      default:
+        return [];
+    }
+  };
 
   const handleChoosePlan = (plan) => {
-    localStorage.setItem("selectedPlan", JSON.stringify(plan));
+    localStorage.setItem(
+      "selectedPlan",
+      JSON.stringify({
+        ...plan,
+        backendId: plan.id,
+        documentId: plan.documentId,
+      })
+    );
     navigate("/demorequest");
   };
+
+  if (isLoading) {
+    return (
+      <main className="bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className="text-lg">Loading plans...</p>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className="text-lg text-red-500">{error}</p>
+      </main>
+    );
+  }
 
   return (
     <main className="bg-gray-100">
@@ -83,13 +152,13 @@ function Plans() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 justify-center bg-white p-2 sm:p-6 rounded-xl items-center gap-6">
-          {plans.map((plan, index) => (
+          {plans.map((plan) => (
             <div
-              key={index}
+              key={plan.documentId || plan.id}
               onClick={() => handleChoosePlan(plan)}
               className={`w-56 bg-white ${
                 plan.title === "Premium" ? "h-80" : "h-72"
-              } rounded-xl hover:bg-[#EB6505] active:bg-[#EB6505] flex flex-col gap-4 text-[#848199] hover:text-white active:text-white p-2`}
+              } rounded-xl hover:bg-[#EB6505] active:bg-[#EB6505] flex flex-col gap-4 text-[#848199] hover:text-white active:text-white p-2 cursor-pointer transition-colors duration-300`}
             >
               {plan.badge && (
                 <div className="text-blue-500 text-[10px] font-medium border border-gray-300 w-20 bg-white px-2 py-1 rounded-full flex justify-end">
@@ -123,7 +192,13 @@ function Plans() {
                 ))}
               </div>
               <div className="flex justify-center mt-auto">
-                <button className="px-6 cursor-pointer py-1 rounded-3xl bg-orange-200 text-[#EB6505] hover:bg-white">
+                <button
+                  className="px-6 py-1 rounded-3xl bg-orange-200 text-[#EB6505] hover:bg-white transition-colors duration-300"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleChoosePlan(plan);
+                  }}
+                >
                   Choose Plan
                 </button>
               </div>

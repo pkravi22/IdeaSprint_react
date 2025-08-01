@@ -821,7 +821,7 @@ console.log("all plans ",plans)
                 >
                   <div className="flex justify-between">
                     <h3 className="text-lg sm:text-xl font-medium text-[#2F2F2F]">
-                      {plan.name}
+                      {plan.title}
                     </h3>
                     <p className="text-lg sm:text-xl font-medium text-[#2F2F2F]">
                       {plan.price}

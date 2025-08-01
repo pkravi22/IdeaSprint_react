@@ -41,7 +41,9 @@ const Home = () => {
       <div id="pricing">
         <Plans />
       </div>
-      <div id="projects">{/* <ProjectsShowcase /> */}</div>
+      <div id="projects">
+        <ProjectsShowcase />
+      </div>
       <div id="testimonials">
         <FounderTestimonials />
       </div>

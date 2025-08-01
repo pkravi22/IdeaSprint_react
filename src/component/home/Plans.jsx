@@ -10,56 +10,48 @@ function Plans() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { allPlans, setAllPlans } = useUser();
-  const planInLocalStorage = localStorage.getItem("allPlans");
+
   useEffect(() => {
     const planInLocalStorage = localStorage.getItem("allPlans");
 
-    if (planInLocalStorage) {
-      const parsedPlans = JSON.parse(planInLocalStorage);
-      setPlans(parsedPlans);
-      setAllPlans(parsedPlans);
-      setIsLoading(false);
-    } else {
-      const fetchPlans = async () => {
-        try {
-          setIsLoading(true);
-          const response = await axios.get(
-            "https://ideasprint-backend.onrender.com/api/plans"
-          );
+    const fetchPlans = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          "https://ideasprint-backend.onrender.com/api/plans"
+        );
 
-          const transformedPlans = response.data.data.map((plan) => ({
-            id: plan.id,
-            documentId: plan.documentId,
-            title: plan.name,
-            price: `$${plan.price}`,
-            duration: "/month",
-            badge: plan.name === "Premium" ? "Most Popular" : null,
-            category: getCategory(plan.name),
-            features: getFeatures(plan.name),
-            backendData: {
-              createdAt: plan.createdAt,
-              currency: plan.currency,
-              publishedAt: plan.publishedAt,
-              updatedAt: plan.updatedAt,
-            },
-          }));
+        const transformedPlans = response.data.data.map((plan) => ({
+          id: plan.id,
+          documentId: plan.documentId,
+          title: plan.name,
+          price: `$${plan.price}`,
+          duration: "/month",
+          badge: plan.name === "Premium" ? "Most Popular" : null,
+          category: getCategory(plan.name),
+          features: getFeatures(plan.name),
+          backendData: {
+            createdAt: plan.createdAt,
+            currency: plan.currency,
+            publishedAt: plan.publishedAt,
+            updatedAt: plan.updatedAt,
+          },
+        }));
 
-          setPlans(transformedPlans);
-          setAllPlans(transformedPlans);
-          localStorage.setItem("allPlans", JSON.stringify(transformedPlans));
-        } catch (err) {
-          console.error("Error fetching plans:", err);
-          setError("Failed to load plans. Please try again later.");
-        } finally {
-          setIsLoading(false);
-        }
-      };
+        setPlans(transformedPlans);
+        setAllPlans(transformedPlans);
+        localStorage.setItem("allPlans", JSON.stringify(transformedPlans));
+      } catch (err) {
+        console.error("Error fetching plans:", err);
+        setError("Failed to load plans. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      fetchPlans();
-    }
+    fetchPlans();
   }, []);
 
-  // Helper functions to map plan names to UI details
   const getCategory = (planName) => {
     switch (planName) {
       case "Basic":
@@ -122,13 +114,21 @@ function Plans() {
     navigate("/demorequest");
   };
 
-  if (isLoading) {
-    return (
-      <main className="bg-gray-100 min-h-screen flex items-center justify-center">
-        <p className="text-lg">Loading plans...</p>
-      </main>
-    );
-  }
+  const renderSkeletonCards = () => {
+    return Array.from({ length: 4 }).map((_, index) => (
+      <div
+        key={index}
+        className="w-56 h-72 bg-gray-200 animate-pulse rounded-xl p-4 flex flex-col gap-4"
+      >
+        <div className="h-4 w-1/2 bg-gray-300 rounded"></div>
+        <div className="h-6 w-3/4 bg-gray-300 rounded"></div>
+        <div className="h-3 w-full bg-gray-300 rounded"></div>
+        <div className="h-3 w-5/6 bg-gray-300 rounded"></div>
+        <div className="h-3 w-4/5 bg-gray-300 rounded"></div>
+        <div className="h-8 w-24 bg-gray-300 rounded self-center mt-auto"></div>
+      </div>
+    ));
+  };
 
   if (error) {
     return (
@@ -152,58 +152,62 @@ function Plans() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 justify-center bg-white p-2 sm:p-6 rounded-xl items-center gap-6">
-          {plans.map((plan) => (
-            <div
-              key={plan.documentId || plan.id}
-              onClick={() => handleChoosePlan(plan)}
-              className={`w-56 bg-white ${
-                plan.title === "Premium" ? "h-80" : "h-72"
-              } rounded-xl hover:bg-[#EB6505] active:bg-[#EB6505] flex flex-col gap-4 text-[#848199] hover:text-white active:text-white p-2 cursor-pointer transition-colors duration-300`}
-            >
-              {plan.badge && (
-                <div className="text-blue-500 text-[10px] font-medium border border-gray-300 w-20 bg-white px-2 py-1 rounded-full flex justify-end">
-                  {plan.badge}
-                </div>
-              )}
-              <div>
-                <p className="text-2xl font-inter font-medium tracking-tighter text-black">
-                  {plan.price}{" "}
-                  <span className="text-gray-500">{plan.duration}</span>
-                </p>
-              </div>
-              <div>
-                <p className="text-xl text-black font-medium">{plan.title}</p>
-                <p className="font-inter tracking-tight text-[15px]">
-                  {plan.category}
-                </p>
-              </div>
-              <div className="flex flex-col gap-1">
-                {plan.features.map((feature, i) => (
-                  <div className="flex items-center gap-2" key={i}>
-                    <img
-                      src={tick}
-                      alt="check"
-                      className="w-4 h-4 bg-orange-300 rounded-full p-1"
-                    />
-                    <p className="font-inter tracking-tight text-[15px]">
-                      {feature}
+          {isLoading
+            ? renderSkeletonCards()
+            : plans.map((plan) => (
+                <div
+                  key={plan.documentId || plan.id}
+                  onClick={() => handleChoosePlan(plan)}
+                  className={`w-56 bg-white ${
+                    plan.title === "Premium" ? "h-80" : "h-72"
+                  } rounded-xl hover:bg-[#EB6505] active:bg-[#EB6505] flex flex-col gap-4 text-[#848199] hover:text-white active:text-white p-2 cursor-pointer transition-colors duration-300`}
+                >
+                  {plan.badge && (
+                    <div className="text-blue-500 text-[10px] font-medium border border-gray-300 w-20 bg-white px-2 py-1 rounded-full flex justify-end">
+                      {plan.badge}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-2xl font-inter font-medium tracking-tighter text-black">
+                      {plan.price}{" "}
+                      <span className="text-gray-500">{plan.duration}</span>
                     </p>
                   </div>
-                ))}
-              </div>
-              <div className="flex justify-center mt-auto">
-                <button
-                  className="px-6 py-1 rounded-3xl bg-orange-200 text-[#EB6505] hover:bg-white transition-colors duration-300"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleChoosePlan(plan);
-                  }}
-                >
-                  Choose Plan
-                </button>
-              </div>
-            </div>
-          ))}
+                  <div>
+                    <p className="text-xl text-black font-medium">
+                      {plan.title}
+                    </p>
+                    <p className="font-inter tracking-tight text-[15px]">
+                      {plan.category}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {plan.features.map((feature, i) => (
+                      <div className="flex items-center gap-2" key={i}>
+                        <img
+                          src={tick}
+                          alt="check"
+                          className="w-4 h-4 bg-orange-300 rounded-full p-1"
+                        />
+                        <p className="font-inter tracking-tight text-[15px]">
+                          {feature}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-center mt-auto">
+                    <button
+                      className="px-6 py-1 rounded-3xl bg-orange-200 text-[#EB6505] hover:bg-white transition-colors duration-300"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleChoosePlan(plan);
+                      }}
+                    >
+                      Choose Plan
+                    </button>
+                  </div>
+                </div>
+              ))}
         </div>
       </div>
     </main>

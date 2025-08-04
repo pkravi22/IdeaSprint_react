@@ -9,14 +9,28 @@ function Plans() {
   const [plans, setPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { allPlans, setAllPlans } = useUser();
+  const { setAllPlans } = useUser();
+
+  // Helper: Sort by numeric value of price
+  const sortPlansByPrice = (plans) => {
+    return plans.sort((a, b) => {
+      const priceA = parseFloat(a.price.replace("$", ""));
+      const priceB = parseFloat(b.price.replace("$", ""));
+      return priceA - priceB;
+    });
+  };
 
   useEffect(() => {
     const planInLocalStorage = localStorage.getItem("allPlans");
 
+    if (planInLocalStorage) {
+      const parsedPlans = sortPlansByPrice(JSON.parse(planInLocalStorage));
+      setPlans(parsedPlans);
+      setIsLoading(false); // Load cached plans instantly
+    }
+
     const fetchPlans = async () => {
       try {
-        setIsLoading(true);
         const response = await axios.get(
           "https://ideasprint-backend.onrender.com/api/plans"
         );
@@ -38,14 +52,26 @@ function Plans() {
           },
         }));
 
-        setPlans(transformedPlans);
-        setAllPlans(transformedPlans);
-        localStorage.setItem("allPlans", JSON.stringify(transformedPlans));
+        const sortedPlans = sortPlansByPrice(transformedPlans);
+
+        // Check if fetched data is different
+        const localPlans = JSON.parse(localStorage.getItem("allPlans") || "[]");
+        const isSame =
+          JSON.stringify(sortPlansByPrice(localPlans)) ===
+          JSON.stringify(sortedPlans);
+
+        if (!isSame) {
+          setPlans(sortedPlans);
+          setAllPlans(sortedPlans);
+          localStorage.setItem("allPlans", JSON.stringify(sortedPlans));
+        }
       } catch (err) {
         console.error("Error fetching plans:", err);
-        setError("Failed to load plans. Please try again later.");
+        if (!planInLocalStorage) {
+          setError("Failed to load plans. Please try again later.");
+        }
       } finally {
-        setIsLoading(false);
+        if (!planInLocalStorage) setIsLoading(false);
       }
     };
 
